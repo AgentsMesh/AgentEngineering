@@ -1,0 +1,38 @@
+# 核心概念的定义位置。
+#
+# 判定：一个概念**首次出现**的地方，附近必须有指向它定义的指针。
+#
+# 为什么需要这条：书里的前向引用是正常的（读到一半提到后面的概念），
+# 但如果第一次提到时不给指针，读者就卡住了 —— 而他不知道
+# 这个词在哪一章被定义，也不知道该不该现在去查。
+#
+# 这条规则是在一次结构审查里长出来的：13 个核心概念，
+# 只有 3 个在首次出现时给了指针。
+
+concepts:
+  - term: "判定边界"
+    anchor: sec-same-boundary
+  - term: "载体"
+    anchor: sec-five-carriers
+  - term: "假绿"
+    anchor: sec-fake-green
+  - term: "变异验证"
+    anchor: sec-mutation
+  - term: "哨兵"
+    anchor: sec-sentinel
+  - term: "报数模式"
+    anchor: sec-enforce-levels
+  - term: "债务台账"
+    anchor: sec-baseline
+  - term: "前馈"
+    anchor: sec-ground-and-walls
+  - term: "增益"
+    anchor: sec-two-variables
+  - term: "串级"
+    anchor: sec-cascade
+  - term: "观测器"
+    anchor: sec-not-more-sensors
+  - term: "可观测性"
+    anchor: sec-observability
+  - term: "参考输入"
+    anchor: sec-no-self-setpoint

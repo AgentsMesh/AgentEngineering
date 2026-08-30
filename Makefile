@@ -41,7 +41,7 @@ serve: tool-quarto
 # ---------- 判定 ----------
 
 .PHONY: check
-check: check-typography check-xref check-budget check-terms check-claims
+check: check-typography check-xref check-budget check-terms check-claims check-concepts
 	@echo "✓ 全部判定通过"
 
 # 基建自检：工具缺失是 exit 2，不是"你写错了"。
@@ -89,6 +89,11 @@ check-terms: tool-python
 .PHONY: check-claims
 check-claims: tool-python
 	@python3 checks/claims.py
+
+# 核心概念首次出现时必须带指向定义的指针
+.PHONY: check-concepts
+check-concepts: tool-python
+	@python3 checks/concepts.py
 
 .PHONY: clean
 clean:
