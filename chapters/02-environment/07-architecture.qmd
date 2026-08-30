@@ -730,7 +730,7 @@ XCTAssertEqual(assembleCounter.value, 1, ...)
 
 **一、方向决定影响面能不能被计算。**
 
-三段各有一个方向（@sec-three-phases），
+三段各有一个方向（@sec-derive · @sec-runtime · @sec-delivery），
 而方向的价值不在"更整洁"，在于
 **Agent 可以沿着方向推出"这次改动会影响谁"** ——
 而它自己没有影响面的直觉（@sec-no-blast-intuition）。
