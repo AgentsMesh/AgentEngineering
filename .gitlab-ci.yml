@@ -19,11 +19,13 @@ check:
   allow_failure:
     exit_codes: [2]
 
-# 判定：能不能构建出来（构建失败通常是 exit 2 类）
+# 判定：两种格式都要能构建出来。
+# ⚠️ 必须是 build-all 而不是 html —— 本地预览只渲染 HTML，
+# 所以 PDF 那一侧的错误只有 CI 能发现。
 build:
   stage: build
   script:
-    - make html
+    - make build-all
   artifacts:
     paths: [_output/]
     expire_in: 1 week

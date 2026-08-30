@@ -9,6 +9,7 @@ CHAPTERS := $(shell find chapters -name '*.qmd' 2>/dev/null)
 help:
 	@echo "make html       构建网页版"
 	@echo "make pdf        构建 PDF（Typst）"
+	@echo "make build-all  两种格式都构建（CI 跑这个）"
 	@echo "make preview    本机实时预览（localhost）"
 	@echo "make serve      局域网实时预览（手机也能看）"
 	@echo "make check      全部判定（= CI 跑的东西）"
@@ -27,16 +28,26 @@ html: tool-quarto
 pdf: tool-quarto
 	quarto render --to typst
 
-# 本机预览：只绑 127.0.0.1，自动开浏览器，改文件自动重渲染
+# 两种格式都构建 —— CI 跑这个，因为 preview 只看 HTML，
+# 而 PDF 那一侧的错误必须有地方能发现。
+.PHONY: build-all
+build-all: tool-quarto
+	quarto render
+
+# 本机预览：只绑 127.0.0.1，自动开浏览器，改文件自动重渲染。
+# ⚠️ 显式 --to html：quarto preview 默认渲染全部格式，
+# 于是 PDF 那一侧的任何错误（缺一个 Typst 函数就够了）
+# 会让整个预览显示一个空白的 render error —— 而 HTML 本身是好的。
+# 一次判定失败不该污染另一次判定。
 preview: tool-quarto
-	quarto preview --port $(PORT)
+	quarto preview --to html --port $(PORT)
 
 # 局域网预览：绑全部网卡，同一个 Wi-Fi 下的手机/平板/别的机器都能看
 # 注意这会把这本书暴露给同网段的所有设备。
 serve: tool-quarto
 	@ip=$$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo 127.0.0.1); \
 	echo "局域网地址: http://$$ip:$(PORT)"; \
-	quarto preview --host 0.0.0.0 --port $(PORT) --no-browser
+	quarto preview --to html --host 0.0.0.0 --port $(PORT) --no-browser
 
 # ---------- 判定 ----------
 
