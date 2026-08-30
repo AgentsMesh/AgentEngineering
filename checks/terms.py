@@ -15,11 +15,20 @@ def main() -> int:
     for path in sorted(ROOT.glob("chapters/**/*.qmd")):
         text = path.read_text(encoding="utf-8").splitlines()
         in_fence = False
+        exempt = False
         for lineno, line in enumerate(text, 1):
             if line.strip().startswith("```"):
                 in_fence = not in_fence
                 continue
-            if in_fence or line.strip().startswith("<!--"):
+            # 区段豁免：讨论术语本身的散文，不该被术语规则命中。
+            # 对应源系统的 source_view = code_only —— 规则不看讲解自己的文字。
+            if "<!-- terms:off -->" in line:
+                exempt = True
+                continue
+            if "<!-- terms:on -->" in line:
+                exempt = False
+                continue
+            if in_fence or exempt or line.strip().startswith("<!--"):
                 continue
             for term in TERMS:
                 # 先把豁免片段挖掉再匹配，否则规则会在正确的用法上误报，
