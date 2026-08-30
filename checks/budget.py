@@ -36,7 +36,11 @@ def body_chars(path: Path) -> int:
         if in_fence:
             continue
         s = line.strip()
-        if s.startswith(("|", ">", "!", "#")):      # 表格 引用 图片 标题
+        # 表格、引用、标题都是内容，计入。
+        # 只排除图片行与 Quarto 的 div 标记 —— 它们不占正文篇幅。
+        # 代码块已经在上面的 fence 分支里排除了：它是证据，不是正文，
+        # 而且以 ASCII 为主，计进来会严重扭曲中文字数。
+        if s.startswith(("!", ":::")):
             continue
         out.append(line)
 
