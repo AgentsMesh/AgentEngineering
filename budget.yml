@@ -6,7 +6,7 @@
 #
 # 改预算是一个决定，单独一个 commit，不许和写作混在一起。
 
-total: 151500
+total: 152200
 tolerance: 0.20
 
 chapters:
@@ -40,4 +40,8 @@ chapters:
   "chapters/05-appendix/a-rules.qmd":                     3000
   "chapters/05-appendix/b-arbiters.qmd":                  2500
   "chapters/05-appendix/c-always-on.qmd":                 3000
-  "chapters/05-appendix/d-glossary.qmd":                  1500
+  # 附录 D 调高 1500 → 2200：写作过程中它长出了「按使用场景重新索引」
+  # 和「最容易被误用的三个词」两节。它们不是词条，是导航 ——
+  # 而一份 300 页的书里，术语表承担导航是合理的。
+  # 这是一次预算决定，不是写超了。
+  "chapters/05-appendix/d-glossary.qmd":                  2200
