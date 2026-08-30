@@ -9,22 +9,34 @@ CHAPTERS := $(shell find chapters -name '*.qmd' 2>/dev/null)
 help:
 	@echo "make html       构建网页版"
 	@echo "make pdf        构建 PDF（Typst）"
-	@echo "make preview    实时预览"
+	@echo "make preview    本机实时预览（localhost）"
+	@echo "make serve      局域网实时预览（手机也能看）"
 	@echo "make check      全部判定（= CI 跑的东西）"
 	@echo "make fix        自动修可修的（中文排版）"
 	@echo "make wordcount  字数进度对照预算"
 
 # ---------- 构建 ----------
 
-.PHONY: html pdf preview
+# 预览端口。改这个值可以同时开多个预览。
+PORT ?= 4200
+
+.PHONY: html pdf preview serve
 html: tools
 	quarto render --to html
 
 pdf: tools
 	quarto render --to typst
 
+# 本机预览：只绑 127.0.0.1，自动开浏览器，改文件自动重渲染
 preview: tools
-	quarto preview
+	quarto preview --port $(PORT)
+
+# 局域网预览：绑全部网卡，同一个 Wi-Fi 下的手机/平板/别的机器都能看
+# 注意这会把这本书暴露给同网段的所有设备。
+serve: tools
+	@ip=$$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo 127.0.0.1); \
+	echo "局域网地址: http://$$ip:$(PORT)"; \
+	quarto preview --host 0.0.0.0 --port $(PORT) --no-browser
 
 # ---------- 判定 ----------
 

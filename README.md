@@ -9,10 +9,14 @@ brew install quarto typst
 cargo install autocorrect --locked
 pip install pyyaml
 
-make preview      # 实时预览
+make preview      # 本机实时预览 → http://localhost:4200
+make serve        # 局域网实时预览（手机也能看），会打印局域网地址
 make check        # 全部判定（= CI 跑的东西）
 make wordcount    # 字数进度对照预算
 ```
+
+`make serve` 绑的是 `0.0.0.0`，同网段的设备都能访问。
+换端口：`make serve PORT=8080`。
 
 ## 这个仓库怎么组织
 
