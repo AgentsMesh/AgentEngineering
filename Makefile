@@ -52,7 +52,7 @@ serve: tool-quarto
 # ---------- 判定 ----------
 
 .PHONY: check
-check: check-typography check-xref check-budget check-terms check-claims check-concepts
+check: check-typography check-xref check-budget check-terms check-claims check-concepts check-voice
 	@echo "✓ 全部判定通过"
 
 # 基建自检：工具缺失是 exit 2，不是"你写错了"。
@@ -105,6 +105,11 @@ check-claims: tool-python
 .PHONY: check-concepts
 check-concepts: tool-python
 	@python3 checks/concepts.py
+
+# 口吻：第三人称自指 + 答辩腔
+.PHONY: check-voice
+check-voice: tool-python
+	@python3 checks/voice.py
 
 .PHONY: clean
 clean:
