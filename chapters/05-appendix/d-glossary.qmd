@@ -5,14 +5,72 @@ claim: "读者在任何一章遇到不认识的词都能查到，且不会把两
 
 # 附录 D · 术语表 {#sec-appendix-glossary}
 
-<!-- 术语的唯一写法由仓库根目录的 terms.yml 强制，这里是它的人读版本。
-     每条给：中文 · 英文 · 一句话定义 · 首次出现的章节
+## 判定相关 {#sec-glossary-verdict}
 
-     容易混淆的几组要专门辨析：
-       判定 vs 检查        —— 判定是结论，检查是产生结论的动作
-       不变量 vs 规则      —— 不变量是必须保持的事实，规则是它的可执行形态
-       前馈 vs 反馈        —— 按有没有用到输出来分，不按快慢分
-       假绿 vs 误报        —— 假绿是该红没红，误报是不该红却红了
-       report-only vs 豁免 —— 前者仍在测量，后者不再测量
-       增益 vs 吞吐        —— 增益是每单位误差施加的修正，吞吐是单位时间的产出
--->
+| 中文 | 英文 | 一句话 | 首见 |
+|---|---|---|---|
+| 判定 | verdict | 一次检查得出的结论，绑定在它观察到的那个版本上 | @sec-three-failures |
+| 内容违规 | policy violation | 这次改动触碰了规则，退出码 1 | @sec-cannot-judge |
+| 基建故障 | infrastructure failure | 判不了，退出码 2 | @sec-cannot-judge |
+| 假绿 | — | 测试通过但实际没有验证任何行为 | @sec-fake-green |
+| 变异验证 | mutation verification | 拿掉修复，测试必须重新变红 | @sec-mutation |
+| 哨兵下限 | sentinel | 一条规则至少应该看到多少个事实 | @sec-sentinel |
+| 报数模式 | report-only | 测量并报告，但不拦截 | @sec-enforce-levels |
+| 债务台账 | baseline | 被审阅过的历史违规清单，**只允许单调收敛** | @sec-baseline |
+
+**容易混淆的两组：**
+
+- **判定 vs 检查** —— 判定是结论，检查是产生结论的动作
+- **报数模式 vs 豁免** —— 前者**仍在测量**，后者**不再测量**
+
+## 结构相关 {#sec-glossary-structure}
+
+| 中文 | 英文 | 一句话 | 首见 |
+|---|---|---|---|
+| 不变量 | invariant | 一条必须保持的事实 | @sec-arbiter |
+| 载体 | — | 规则存放的地方，由"什么时候需要到达"决定 | @sec-five-carriers |
+| 被挣得 | earned | 一个结构层必须由真实的第二个实例证成 | @sec-earned-level |
+| 单一写者 | single writer | 一份可变状态只有一个地方能改 | @sec-shape-b |
+| 组合根 | composition root | 唯一知道自己 owner 全部依赖的地方 | @sec-role-buckets |
+| 稀疏测量 | — | 只观测本次真正变化的那个子空间 | @sec-walls-restated |
+
+**容易混淆的一组：**
+
+- **不变量 vs 规则** —— 不变量是必须保持的**事实**，规则是它的**可执行形态**。
+  一个不变量可以没有规则（靠人评审），一条规则背后一定有一个不变量。
+
+## 控制相关 {#sec-glossary-control}
+
+| 中文 | 英文 | 一句话 | 首见 |
+|---|---|---|---|
+| 回路 | loop | 测量 → 比较 → 修正 → 再测量 | @sec-control-model |
+| 前馈 | feedforward | 在扰动产生影响之前补偿掉它 | @sec-ground-and-walls |
+| 反馈 | feedback | 测量输出，发现偏差后修正 | @sec-ground-and-walls |
+| 被控对象 | plant | 你要控制的那个东西 | @sec-control-model |
+| 增益 | gain | 每单位测得的误差，施加多少修正 | @sec-two-variables |
+| 回路延迟 | loop delay | 从产生改动到判定回到手里的时间 | @sec-two-variables |
+| 串级控制 | cascade | 快内环抑制大部分扰动，慢外环处理漏过来的 | @sec-cascade |
+| 死区 | deadband | 误差在某个范围内时不动作 | @sec-deadband |
+| 抗积分饱和 | anti-windup | 防止追一个到不了的目标时修正量无界增长 | @sec-cross-session |
+| 传感器故障 | sensor fault | 测量本身坏了，而不是被测的东西坏了 | @sec-sensor-faults |
+| 解析冗余 | analytical redundancy | 用第二个独立通道验第一个 | @sec-analytical-redundancy |
+| 机内自检 | BITE | 主动注入已知故障，看传感器响不响 | @sec-bite |
+| 观测器 | observer | 用模型加可测量，估计测不到的状态 | @sec-not-more-sensors |
+| 可观测性 | observability | 能否从输出推出内部状态 | @sec-observability |
+| 参考输入 | setpoint / reference | 输出应该是多少，**必须来自回路之外** | @sec-no-self-setpoint |
+| 稳定裕度 | stability margin | 距离失稳还剩多少余量 | @sec-margin-shrinking |
+
+**容易混淆的两组：**
+
+- **前馈 vs 反馈** —— 按**有没有用到输出**来分，**不按快慢分**。
+  一个很快的检查仍然是反馈。
+- **增益 vs 吞吐** —— 增益是**每单位误差**施加的修正，吞吐是单位时间的产出。
+  两者在这本书里高度相关，但不是同一个量。
+
+## 保留英文的 {#sec-glossary-english}
+
+| 词 | 为什么不译 |
+|---|---|
+| worktree | 它是版本控制的命令名 |
+| skill / guide | 它们是这套体系里的专有角色名 |
+| flake | "偶发失败"没有它准确，而且它已是通用术语 |
