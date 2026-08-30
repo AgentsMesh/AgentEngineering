@@ -53,6 +53,8 @@ book:
 
 format:
   html:
+    mermaid:
+      theme: neutral
     theme: cosmo
     toc: true
     toc-depth: 3

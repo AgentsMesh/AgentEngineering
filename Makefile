@@ -14,6 +14,7 @@ help:
 	@echo "make serve      局域网实时预览（手机也能看）"
 	@echo "make check      全部判定（= CI 跑的东西）"
 	@echo "make fix        自动修可修的（中文排版）"
+	@echo "make check-prose 行文形态（报数模式，逐章改写中）"
 	@echo "make check-numbering 章节编号一致性（需要先 make html）"
 	@echo "make check-serve 逐页验证预览服务（需要 make serve 正在跑）"
 	@echo "make wordcount  字数进度对照预算"
@@ -107,6 +108,16 @@ check-claims: tool-python
 .PHONY: check-concepts
 check-concepts: tool-python
 	@python3 checks/concepts.py
+
+# 行文形态：段落成型、加粗密度。
+# 报数模式（不拦人）—— 全书正在逐章改写，存量还没清完。
+# 这正是正文 @sec-four-steps 讲的那个上线流程：先报数，等收敛了再切拦截。
+.PHONY: check-prose check-prose-strict
+check-prose: tool-python
+	@python3 checks/prose.py
+
+check-prose-strict: tool-python
+	@python3 checks/prose.py --strict
 
 # 口吻：第三人称自指 + 答辩腔
 .PHONY: check-voice
