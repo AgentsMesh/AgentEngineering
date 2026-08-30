@@ -1,0 +1,5 @@
+_output/
+.quarto/
+*.pdf
+.DS_Store
+__pycache__/

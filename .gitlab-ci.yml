@@ -1,0 +1,29 @@
+# 本地与 CI 跑同一条命令、同一份配置。
+# 退出码语义与正文第 11 章一致：0 通过 / 1 内容违规 / 2 基建故障。
+# 两类失败绝不共用一个重试分支。
+
+stages: [check, build]
+
+default:
+  image: ghcr.io/quarto-dev/quarto:latest
+  before_script:
+    - command -v autocorrect >/dev/null || cargo install autocorrect --locked
+    - pip install -q pyyaml
+
+# 判定：内容
+check:
+  stage: check
+  script:
+    - make check
+  # exit 1 = 改稿；exit 2 = 改环境。CI 只在 exit 1 时把结论归给作者。
+  allow_failure:
+    exit_codes: [2]
+
+# 判定：能不能构建出来（构建失败通常是 exit 2 类）
+build:
+  stage: build
+  script:
+    - make html
+  artifacts:
+    paths: [_output/]
+    expire_in: 1 week

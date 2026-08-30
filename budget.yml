@@ -1,0 +1,43 @@
+# 每章字数预算（中文字符，不含代码块、表格与引用块）。总计 150,000 字。
+#
+# 上下界都是判定条件，不是建议：
+#   低于下界 = 这章没写完，或者它本来就不该独立成章
+#   高于上界 = 它在膨胀，该拆或该砍
+#
+# 改预算是一个决定，单独一个 commit，不许和写作混在一起。
+
+total: 151500
+tolerance: 0.20
+
+chapters:
+  "index.qmd":                                            1500
+
+  "chapters/01-problem/01-two-walls.qmd":                 4500
+  "chapters/01-problem/02-where-uncertainty-lives.qmd":   6000
+  "chapters/01-problem/03-what-we-promise.qmd":           4000
+  "chapters/01-problem/04-seven-shapes.qmd":              7500
+
+  "chapters/02-environment/05-environment-first.qmd":     4000
+  "chapters/02-environment/06-codebase.qmd":              9000
+  "chapters/02-environment/07-architecture.qmd":          9000
+  "chapters/02-environment/08-carriers.qmd":             10000
+  "chapters/02-environment/09-toolchain.qmd":             9000
+  "chapters/02-environment/10-small-scale-environment.qmd": 7000
+
+  "chapters/03-verdict/11-three-failures.qmd":            4000
+  "chapters/03-verdict/12-tests.qmd":                    10000
+  "chapters/03-verdict/13-guardrails.qmd":               10000
+  "chapters/03-verdict/14-arbiter.qmd":                   9000
+  "chapters/03-verdict/15-rule-lifecycle.qmd":            7000
+  "chapters/03-verdict/16-small-scale-verdict.qmd":       5000
+
+  "chapters/04-loop/17-gain-and-delay.qmd":               6000
+  "chapters/04-loop/18-sensor-faults.qmd":                6000
+  "chapters/04-loop/19-observer.qmd":                     5000
+  "chapters/04-loop/20-setpoint-outside.qmd":             4000
+  "chapters/04-loop/21-boundaries.qmd":                   4000
+
+  "chapters/05-appendix/a-rules.qmd":                     3000
+  "chapters/05-appendix/b-arbiters.qmd":                  2500
+  "chapters/05-appendix/c-always-on.qmd":                 3000
+  "chapters/05-appendix/d-glossary.qmd":                  1500

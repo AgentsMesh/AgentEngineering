@@ -1,0 +1,46 @@
+# 术语表 —— 同一个概念全书只能有一种写法。
+#
+# 这不是文风洁癖。一本 300 页的书里，"判定 / 裁决 / 仲裁"混用会让读者
+# 以为它们是三个不同的东西，然后花力气去找区别 —— 而区别并不存在。
+#
+# canonical: 唯一正确写法
+# forbidden: 见到就报错的写法
+
+terms:
+  - canonical: "判定"
+    forbidden: ["裁决", "评判", "裁定"]
+    note: "verdict。ARBITER 里的 arbiter 译作『裁决者』是角色名，不受此限"
+
+  - canonical: "不变量"
+    forbidden: ["恒定量", "不变式"]
+    note: "invariant"
+
+  - canonical: "载体"
+    forbidden: ["承载体", "介质"]
+    note: "规则存放的地方：CLAUDE.md / skill / guide / ARBITER"
+
+  - canonical: "假绿"
+    forbidden: ["伪绿", "假通过", "虚假通过"]
+    note: "测试通过但实际没有验证任何行为"
+
+  - canonical: "回路"
+    forbidden: ["闭环回路", "环路"]
+    note: "control loop。『开环』『闭环』作形容词可用"
+
+  - canonical: "前馈"
+    forbidden: ["预馈", "正馈"]
+
+  - canonical: "被控对象"
+    forbidden: ["受控对象", "控制对象"]
+    note: "plant"
+
+  - canonical: "变异验证"
+    forbidden: ["突变测试", "变异测试"]
+    note: "拿掉修复，测试必须重新变红"
+
+  - canonical: "证据"
+    forbidden: ["凭据", "佐证"]
+
+  - canonical: "worktree"
+    forbidden: ["工作树", "工作区副本"]
+    note: "保留英文，因为它是 git 的命令名"

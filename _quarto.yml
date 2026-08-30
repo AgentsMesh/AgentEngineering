@@ -1,0 +1,90 @@
+project:
+  type: book
+  output-dir: _output
+
+book:
+  title: "让不确定的 Agent 产出确定性的结果"
+  subtitle: "用确定性的基建，把不确定的 Agent 包围起来"
+  author: "yishuiliunian"
+  date: today
+  lang: zh-CN
+
+  # 章节顺序是 SSOT —— 任何地方引用章节都用 @sec- 交叉引用，不写死编号
+  chapters:
+    - index.qmd
+
+    - part: "第一部 · 问题"
+      chapters:
+        - chapters/01-problem/01-two-walls.qmd
+        - chapters/01-problem/02-where-uncertainty-lives.qmd
+        - chapters/01-problem/03-what-we-promise.qmd
+        - chapters/01-problem/04-seven-shapes.qmd
+
+    - part: "第二部 · 环境"
+      chapters:
+        - chapters/02-environment/05-environment-first.qmd
+        - chapters/02-environment/06-codebase.qmd
+        - chapters/02-environment/07-architecture.qmd
+        - chapters/02-environment/08-carriers.qmd
+        - chapters/02-environment/09-toolchain.qmd
+        - chapters/02-environment/10-small-scale-environment.qmd
+
+    - part: "第三部 · 判定"
+      chapters:
+        - chapters/03-verdict/11-three-failures.qmd
+        - chapters/03-verdict/12-tests.qmd
+        - chapters/03-verdict/13-guardrails.qmd
+        - chapters/03-verdict/14-arbiter.qmd
+        - chapters/03-verdict/15-rule-lifecycle.qmd
+        - chapters/03-verdict/16-small-scale-verdict.qmd
+
+    - part: "第四部 · 回路"
+      chapters:
+        - chapters/04-loop/17-gain-and-delay.qmd
+        - chapters/04-loop/18-sensor-faults.qmd
+        - chapters/04-loop/19-observer.qmd
+        - chapters/04-loop/20-setpoint-outside.qmd
+        - chapters/04-loop/21-boundaries.qmd
+
+  appendices:
+    - chapters/05-appendix/a-rules.qmd
+    - chapters/05-appendix/b-arbiters.qmd
+    - chapters/05-appendix/c-always-on.qmd
+    - chapters/05-appendix/d-glossary.qmd
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-copy: true
+    code-overflow: wrap
+    number-sections: true
+    crossref:
+      chapters: true
+
+  typst:
+    papersize: a5
+    margin:
+      top: 2cm
+      bottom: 2cm
+      left: 2cm
+      right: 2cm
+    mainfont: "Source Han Serif SC"
+    sansfont: "Source Han Sans SC"
+    monofont: "Sarasa Mono SC"
+    fontsize: 10pt
+    section-numbering: "1.1.1"
+    template-partials:
+      - includes/typst-show.typ
+      - includes/typst-template.typ
+
+crossref:
+  fig-title: "图"
+  tbl-title: "表"
+  fig-prefix: "图"
+  tbl-prefix: "表"
+  sec-prefix: "第"
+  ref-hyperlink: true
+
+lang: zh
