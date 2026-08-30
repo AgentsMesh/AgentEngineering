@@ -64,8 +64,12 @@ make wordcount
 | 核心概念 | ✓ 13 个，首次出现时全部带指向定义的指针 |
 | 口吻 | ✓ 12 条规则，无第三人称自指与答辩腔 |
 
-另有一道不进 `make check` 的：`make check-serve` 逐页验证预览服务，
-**看内容不看状态码** —— 因为一个空的 render error 页会返回 HTTP 200。
+另有两道不进 `make check` 的（它们需要构建产物或运行中的服务）：
+
+| 命令 | 查什么 |
+|---|---|
+| `make check-numbering` | 章号与页内小节号一致、章号连续、**交叉引用在产物里真的解析了** |
+| `make check-serve` | 逐页看内容，**不看状态码** —— 空的 render error 页会返回 HTTP 200 |
 
 ## 素材来源
 

@@ -26,6 +26,7 @@ build:
   stage: build
   script:
     - make build-all
+    - make check-numbering
   artifacts:
     paths: [_output/]
     expire_in: 1 week

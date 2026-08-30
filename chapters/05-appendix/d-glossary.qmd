@@ -1,9 +1,8 @@
 ---
-title: "附录 D · 术语表"
 claim: "读者在任何一章遇到不认识的词都能查到，且不会把两个相近的词当成同一个"
 ---
 
-# 附录 D · 术语表 {#sec-appendix-glossary}
+# 术语表 {#sec-appendix-glossary}
 
 ## 判定相关 {#sec-glossary-verdict}
 

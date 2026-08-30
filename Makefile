@@ -14,6 +14,7 @@ help:
 	@echo "make serve      局域网实时预览（手机也能看）"
 	@echo "make check      全部判定（= CI 跑的东西）"
 	@echo "make fix        自动修可修的（中文排版）"
+	@echo "make check-numbering 章节编号一致性（需要先 make html）"
 	@echo "make check-serve 逐页验证预览服务（需要 make serve 正在跑）"
 	@echo "make wordcount  字数进度对照预算"
 
@@ -111,6 +112,11 @@ check-concepts: tool-python
 .PHONY: check-voice
 check-voice: tool-python
 	@python3 checks/voice.py
+
+# 章节编号一致性 —— 需要构建产物，所以不进 make check（CI 里 build 之后跑）
+.PHONY: check-numbering
+check-numbering: tool-python
+	@python3 checks/numbering.py
 
 # 预览服务的健康检查 —— 逐页看内容，不看状态码。
 # 不进 `make check`：它需要服务正在跑，而 CI 里没有。
