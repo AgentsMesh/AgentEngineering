@@ -22,8 +22,13 @@ def main() -> int:
             if in_fence or line.strip().startswith("<!--"):
                 continue
             for term in TERMS:
+                # 先把豁免片段挖掉再匹配，否则规则会在正确的用法上误报，
+                # 然后被绕过 —— 见正文 @sec-forbid-tuning
+                probe = line
+                for ok in term.get("allow", []):
+                    probe = probe.replace(ok, "")
                 for bad in term["forbidden"]:
-                    if bad in line:
+                    if bad in probe:
                         hits.append((path, lineno, bad, term["canonical"]))
 
     if hits:

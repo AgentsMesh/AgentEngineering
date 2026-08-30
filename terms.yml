@@ -9,7 +9,11 @@
 terms:
   - canonical: "判定"
     forbidden: ["裁决", "评判", "裁定"]
-    note: "verdict。ARBITER 里的 arbiter 译作『裁决者』是角色名，不受此限"
+    # 豁免的真实意图 = 不要把 verdict 写成「裁决」：
+    #   裁决者 / 裁决逻辑 —— arbiter 的角色名与它的实现，
+    #                        这是名词，不是 verdict 的同义词
+    allow: ["裁决者", "裁决逻辑"]
+    note: "verdict。arbiter 作为角色名译作『裁决者』，不受此限"
 
   - canonical: "不变量"
     forbidden: ["恒定量", "不变式"]
