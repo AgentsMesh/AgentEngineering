@@ -1,0 +1,24 @@
+# AutoCorrect 配置。
+#
+# ⚠️ fileTypes 里的 qmd 是必须的：autocorrect 默认不认识这个扩展名，
+# 不配的话它会扫描 0 个文件、返回 0、显示通过 —— 一个标准的假绿。
+# 这个问题在写这本书的过程中被 checks/typography-sentinel.py 抓到过一次。
+
+rules:
+  # 中英文之间加空格
+  space-word: 1
+  space-punctuation: 1
+  space-bracket: 1
+  space-dash: 0
+  # 全角标点
+  fullwidth: 1
+  # 半角数字/字母
+  halfwidth-word: 1
+  halfwidth-punctuation: 1
+  # 专有名词大小写（关掉：书里大量出现「agent」等小写用法是刻意的）
+  spellcheck: 0
+
+fileTypes:
+  qmd: markdown
+
+textRules: {}

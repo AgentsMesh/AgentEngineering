@@ -3,3 +3,6 @@ _output/
 *.pdf
 .DS_Store
 __pycache__/
+
+/.quarto/
+**/*.quarto_ipynb

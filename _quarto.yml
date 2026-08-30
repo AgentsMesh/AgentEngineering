@@ -7,7 +7,6 @@ book:
   subtitle: "用确定性的基建，把不确定的 Agent 包围起来"
   author: "yishuiliunian"
   date: today
-  lang: zh-CN
 
   # 章节顺序是 SSOT —— 任何地方引用章节都用 @sec- 交叉引用，不写死编号
   chapters:

@@ -21,19 +21,19 @@ help:
 PORT ?= 4200
 
 .PHONY: html pdf preview serve
-html: tools
+html: tool-quarto
 	quarto render --to html
 
-pdf: tools
+pdf: tool-quarto
 	quarto render --to typst
 
 # 本机预览：只绑 127.0.0.1，自动开浏览器，改文件自动重渲染
-preview: tools
+preview: tool-quarto
 	quarto preview --port $(PORT)
 
 # 局域网预览：绑全部网卡，同一个 Wi-Fi 下的手机/平板/别的机器都能看
 # 注意这会把这本书暴露给同网段的所有设备。
-serve: tools
+serve: tool-quarto
 	@ip=$$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo 127.0.0.1); \
 	echo "局域网地址: http://$$ip:$(PORT)"; \
 	quarto preview --host 0.0.0.0 --port $(PORT) --no-browser
@@ -41,32 +41,40 @@ serve: tools
 # ---------- 判定 ----------
 
 .PHONY: check
-check: check-tools check-typography check-xref check-budget check-terms check-claims
+check: check-typography check-xref check-budget check-terms check-claims
 	@echo "✓ 全部判定通过"
 
-# 基建自检：工具缺失是 exit 2，不是"你写错了"
-.PHONY: tools check-tools
-tools check-tools:
-	@command -v quarto      >/dev/null || { echo "guard: quarto 未安装"; exit 2; }
-	@command -v autocorrect  >/dev/null || { echo "guard: autocorrect 未安装"; exit 2; }
-	@command -v python3      >/dev/null || { echo "guard: python3 未安装"; exit 2; }
+# 基建自检：工具缺失是 exit 2，不是"你写错了"。
+# 按需要检查 —— 预览不需要 autocorrect，判定才需要。
+# 一个过度要求的前置检查，会在环境没问题的时候报环境问题。
+.PHONY: tools tool-quarto tool-autocorrect tool-python
+tools: tool-quarto tool-autocorrect tool-python
+
+tool-quarto:
+	@command -v quarto      >/dev/null || { echo "guard: quarto 未安装（brew install --cask quarto）"; exit 2; }
+
+tool-autocorrect:
+	@command -v autocorrect >/dev/null || { echo "guard: autocorrect 未安装（cargo install autocorrect-cli）"; exit 2; }
+
+tool-python:
+	@command -v python3     >/dev/null || { echo "guard: python3 未安装"; exit 2; }
 
 # 中文排版：中英混排空格、全半角标点
 .PHONY: check-typography fix
-check-typography:
-	@autocorrect --lint chapters/ index.qmd || exit 1
+check-typography: tool-autocorrect tool-python
+	@python3 checks/typography.py
 
 fix:
 	@autocorrect --fix chapters/ index.qmd
 
 # 交叉引用有效性：@sec-/@fig-/@tbl- 指向的目标必须存在
 .PHONY: check-xref
-check-xref:
+check-xref: tool-python
 	@python3 checks/xref.py
 
 # 每章字数必须落在预算区间内（防止某章悄悄膨胀或烂尾）
 .PHONY: check-budget wordcount
-check-budget:
+check-budget: tool-python
 	@python3 checks/budget.py --enforce
 
 wordcount:
@@ -74,12 +82,12 @@ wordcount:
 
 # 术语一致性：同一个概念全书只能有一种写法
 .PHONY: check-terms
-check-terms:
+check-terms: tool-python
 	@python3 checks/terms.py
 
 # 每章必须声明它的可验证承诺，且承诺不能为空
 .PHONY: check-claims
-check-claims:
+check-claims: tool-python
 	@python3 checks/claims.py
 
 .PHONY: clean
