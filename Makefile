@@ -19,6 +19,7 @@ help:
 	@echo "make check-numbering 章节编号一致性（需要先 make html）"
 	@echo "make check-serve 逐页验证预览服务（需要 make serve 正在跑）"
 	@echo "make check-pdf-preflight  渲染 PDF 前的端口检查"
+	@echo "make stop-preview  停掉占着预览端口的进程"
 	@echo "make wordcount  字数进度对照预算"
 	@echo "make html-only  只渲染网页 —— 会删掉 PDF 产物"
 	@echo "make pdf-only   只渲染 PDF —— 会删掉网页产物，serve 会 404"
@@ -44,18 +45,28 @@ pdf: build-all
 check-pdf-preflight: tool-python
 	@python3 checks/pdf_preflight.py
 
-html-only: tool-quarto
+html-only: tool-quarto warn-preview
 	@echo "⚠️  这会删掉 _output 里已有的 PDF 产物"
 	quarto render --to html
 
-pdf-only: tool-quarto check-pdf-preflight
-	@echo "⚠️  这会删掉 _output 里已有的 HTML 产物，正在跑的 serve 会 404"
+pdf-only: tool-quarto check-pdf-preflight warn-preview
+	@echo "⚠️  这会删掉 _output 里已有的 HTML 产物"
 	quarto render --to typst
 
 # 两种格式都构建 —— CI 跑这个，因为 preview 只看 HTML，
 # 而 PDF 那一侧的错误必须有地方能发现。
+# 整书渲染会清空 _output/，而正在跑的 preview 持有清空前那一份的状态 ——
+# 渲染完它会 26 页全部返回空的 render error，且不报任何错。
+# 这里不去杀掉别人的进程，只保证这件事不再是静默的。
+.PHONY: warn-preview
+warn-preview:
+	@if lsof -nP -iTCP:$(PORT) -sTCP:LISTEN >/dev/null 2>&1; then \
+	  echo "⚠️  端口 $(PORT) 上有预览在跑 —— 这次渲染会让它开始服务空的 error 页。"; \
+	  echo "   渲染完记得重启预览（或者渲染完跑一次 make check-serve 确认）。"; \
+	fi
+
 .PHONY: build-all
-build-all: tool-quarto check-pdf-preflight
+build-all: tool-quarto check-pdf-preflight warn-preview
 	quarto render
 
 # 本机预览：只绑 127.0.0.1，自动开浏览器，改文件自动重渲染。
@@ -63,10 +74,25 @@ build-all: tool-quarto check-pdf-preflight
 # 于是 PDF 那一侧的任何错误（缺一个 Typst 函数就够了）
 # 会让整个预览显示一个空白的 render error —— 而 HTML 本身是好的。
 # 一次判定失败不该污染另一次判定。
+# 停掉占着预览端口的进程。必须按端口找，不能 pkill 进程名 ——
+# quarto preview 的真实命令行是 `deno … quarto.js preview`，
+# `pkill -f "quarto preview"` 一个都匹配不到。
+# 它的坏处不是没杀掉，是**你以为杀掉了**：
+# 接着起的新进程会因为端口被占直接退出，那行 ERROR 滚过日志没人看见，
+# 而旧进程继续服务它那份坏掉的产物。这个静默失败曾经让人白折腾半小时。
+.PHONY: stop-preview
+stop-preview:
+	@pid=$$(lsof -nP -iTCP:$(PORT) -sTCP:LISTEN -t 2>/dev/null | head -1); \
+	if [ -n "$$pid" ]; then \
+	  echo "停掉 $(PORT) 上的进程 $$pid"; kill $$pid; \
+	  n=0; while lsof -nP -iTCP:$(PORT) -sTCP:LISTEN -t >/dev/null 2>&1; do \
+	    n=$$((n+1)); [ $$n -gt 15 ] && break; sleep 1; done; \
+	fi
+
 # 起预览，等它就绪，自动验一遍 26 页，然后把预览留在前台。
 # 不自动验的话，一个陈掉的预览可以静默地服务十几个小时的空 error 页
 # —— 那次的磁盘产物一直是好的，坏的只有预览进程自己的状态。
-preview: tool-quarto
+preview: tool-quarto stop-preview
 	@quarto preview --to html --port $(PORT) --no-browser & \
 	 pid=$$!; \
 	 n=0; until curl -s http://127.0.0.1:$(PORT)/ 2>/dev/null | head -c 3000 | grep -q .; do \
@@ -77,7 +103,7 @@ preview: tool-quarto
 
 # 局域网预览：绑全部网卡，同一个 Wi-Fi 下的手机/平板/别的机器都能看
 # 注意这会把这本书暴露给同网段的所有设备。
-serve: tool-quarto
+serve: tool-quarto stop-preview
 	@ip=$$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo 127.0.0.1); \
 	echo "局域网地址: http://$$ip:$(PORT)"; \
 	quarto preview --to html --host 0.0.0.0 --port $(PORT) --no-browser & \
