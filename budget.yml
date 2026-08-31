@@ -6,42 +6,42 @@
 #
 # 改预算是一个决定，单独一个 commit，不许和写作混在一起。
 
-total: 152200
+total: 200000
 tolerance: 0.20
 
 chapters:
-  "index.qmd":                                            1500
+  "index.qmd":                                            2000
 
-  "chapters/01-problem/01-two-walls.qmd":                 4500
-  "chapters/01-problem/02-where-uncertainty-lives.qmd":   6000
-  "chapters/01-problem/03-what-we-promise.qmd":           4000
-  "chapters/01-problem/04-seven-shapes.qmd":              7500
+  "chapters/01-problem/01-two-walls.qmd":                 5900
+  "chapters/01-problem/02-where-uncertainty-lives.qmd":   7900
+  "chapters/01-problem/03-what-we-promise.qmd":           5300
+  "chapters/01-problem/04-seven-shapes.qmd":              9900
 
-  "chapters/02-environment/05-environment-first.qmd":     4000
-  "chapters/02-environment/06-codebase.qmd":              9000
-  "chapters/02-environment/07-architecture.qmd":          9000
-  "chapters/02-environment/08-carriers.qmd":             10000
-  "chapters/02-environment/09-toolchain.qmd":             9000
-  "chapters/02-environment/10-small-scale-environment.qmd": 7000
+  "chapters/02-environment/05-environment-first.qmd":     5300
+  "chapters/02-environment/06-codebase.qmd":              11800
+  "chapters/02-environment/07-architecture.qmd":          11800
+  "chapters/02-environment/08-carriers.qmd":             13100
+  "chapters/02-environment/09-toolchain.qmd":             11800
+  "chapters/02-environment/10-small-scale-environment.qmd": 9200
 
-  "chapters/03-verdict/11-three-failures.qmd":            4000
-  "chapters/03-verdict/12-tests.qmd":                    10000
-  "chapters/03-verdict/13-guardrails.qmd":               10000
-  "chapters/03-verdict/14-arbiter.qmd":                   9000
-  "chapters/03-verdict/15-rule-lifecycle.qmd":            7000
-  "chapters/03-verdict/16-small-scale-verdict.qmd":       5000
+  "chapters/03-verdict/11-three-failures.qmd":            5300
+  "chapters/03-verdict/12-tests.qmd":                    13100
+  "chapters/03-verdict/13-guardrails.qmd":               13100
+  "chapters/03-verdict/14-arbiter.qmd":                   11800
+  "chapters/03-verdict/15-rule-lifecycle.qmd":            9200
+  "chapters/03-verdict/16-small-scale-verdict.qmd":       6600
 
-  "chapters/04-loop/17-gain-and-delay.qmd":               6000
-  "chapters/04-loop/18-sensor-faults.qmd":                6000
-  "chapters/04-loop/19-observer.qmd":                     5000
-  "chapters/04-loop/20-setpoint-outside.qmd":             4000
-  "chapters/04-loop/21-boundaries.qmd":                   4000
+  "chapters/04-loop/17-gain-and-delay.qmd":               7900
+  "chapters/04-loop/18-sensor-faults.qmd":                7900
+  "chapters/04-loop/19-observer.qmd":                     6600
+  "chapters/04-loop/20-setpoint-outside.qmd":             5300
+  "chapters/04-loop/21-boundaries.qmd":                   5300
 
-  "chapters/05-appendix/a-rules.qmd":                     3000
-  "chapters/05-appendix/b-arbiters.qmd":                  2500
-  "chapters/05-appendix/c-always-on.qmd":                 3000
+  "chapters/05-appendix/a-rules.qmd":                     3900
+  "chapters/05-appendix/b-arbiters.qmd":                  3300
+  "chapters/05-appendix/c-always-on.qmd":                 3900
   # 附录 D 调高 1500 → 2200：写作过程中它长出了「按使用场景重新索引」
   # 和「最容易被误用的三个词」两节。它们不是词条，是导航 ——
   # 而一份 300 页的书里，术语表承担导航是合理的。
   # 这是一次预算决定，不是写超了。
-  "chapters/05-appendix/d-glossary.qmd":                  2200
+  "chapters/05-appendix/d-glossary.qmd":                  2900
