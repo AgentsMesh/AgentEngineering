@@ -66,6 +66,24 @@ def chapters() -> list[Path]:
     return out
 
 
+def unbalanced_bold(text: str) -> bool:
+    """正文里的 ** 是不是成对。
+
+    一个漏掉的闭合标记不会让 markdown 报错，也不会让页面变得难看多少 ——
+    它只会让「加粗到哪里结束」这个问题的答案一路滑到下一个 ** 为止。
+    对渲染来说是一段过长的加粗；对这条检查来说，是一次几百字的假加粗，
+    足以把全书的占比从 7.3% 抬到 9.8%。
+    量的是同一件事，坏的是量它的那把尺子 —— 所以这里返回基建故障（2），
+    不是内容违规（1）。
+
+    行内代码要先换成占位符：glob 里的 `Modules/**/*.swift` 带一个 **，
+    它不是加粗标记，但会让计数变成奇数。
+    """
+    t = re.sub(r"```.*?```", "§", text, flags=re.S)
+    t = re.sub(r"`[^`\n]*`", "§", t)
+    return t.count("**") % 2 == 1
+
+
 def strip_non_prose(text: str) -> str:
     text = re.sub(r"^---\n.*?\n---\n", "", text, flags=re.S)   # front matter
     text = re.sub(r"```.*?```", "", text, flags=re.S)          # 代码与 mermaid
@@ -101,6 +119,13 @@ def main() -> int:
     bold_count = 0
     bold_chars = 0
     per_chapter: list[tuple[float, str, int]] = []
+
+    broken = [p for p in files if unbalanced_bold(p.read_text(encoding="utf-8"))]
+    if broken:
+        print(f"guard: {len(broken)} 个文件里的 ** 没有成对 —— 加粗统计不可信", file=sys.stderr)
+        for p in broken:
+            print(f"  {p.relative_to(ROOT)}", file=sys.stderr)
+        return 2
 
     for path in files:
         raw = path.read_text(encoding="utf-8")
