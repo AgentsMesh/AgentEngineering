@@ -14,7 +14,7 @@ help:
 	@echo "make serve      局域网实时预览（手机也能看）"
 	@echo "make check      全部判定（= CI 跑的东西）"
 	@echo "make fix        自动修可修的（中文排版）"
-	@echo "make check-prose 行文形态（报数模式，逐章改写中）"
+	@echo "make check-prose 行文形态（只报数，不拦）"
 	@echo "make check-numbering 章节编号一致性（需要先 make html）"
 	@echo "make check-serve 逐页验证预览服务（需要 make serve 正在跑）"
 	@echo "make wordcount  字数进度对照预算"
@@ -55,7 +55,7 @@ serve: tool-quarto
 # ---------- 判定 ----------
 
 .PHONY: check
-check: check-typography check-xref check-budget check-terms check-claims check-concepts check-voice
+check: check-typography check-xref check-budget check-terms check-claims check-concepts check-voice check-prose-strict
 	@echo "✓ 全部判定通过"
 
 # 基建自检：工具缺失是 exit 2，不是"你写错了"。
@@ -110,8 +110,11 @@ check-concepts: tool-python
 	@python3 checks/concepts.py
 
 # 行文形态：段落成型、加粗密度。
-# 报数模式（不拦人）—— 全书正在逐章改写，存量还没清完。
-# 这正是正文 @sec-four-steps 讲的那个上线流程：先报数，等收敛了再切拦截。
+# 2026-08 起切成拦截：26 章全部通过，存量已清零。
+# 这正是正文 @sec-four-steps 讲的那个上线流程 —— 先报数、清存量、再切拦截，
+# 而"零违规的报数规则应该被切成拦截"是 @sec-rule-worth 的直接应用：
+# 此刻切的成本接近零（不会误报，因为没有违规），而它从此提供保护。
+# check-prose 保留为只报数的版本，用来看趋势。
 .PHONY: check-prose check-prose-strict
 check-prose: tool-python
 	@python3 checks/prose.py
