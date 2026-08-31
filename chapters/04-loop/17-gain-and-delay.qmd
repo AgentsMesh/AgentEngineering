@@ -278,6 +278,32 @@ flowchart LR
 它意味着"我算不出基线"不是一个可接受的终态，
 系统必须给出一个确定的答案，哪怕是一个次优的答案。
 
+这条回退链在代码里是一个枚举加一次分派，而它的第一条分支值得单独看：
+
+```rust
+pub fn comparison_revision_plan(inputs: &ComparisonInputs) -> Result<RevisionPlan> {
+    if let Some(candidate) = nonempty(inputs.merge_request_base.as_deref()) {
+        return Ok(RevisionPlan::Exact { candidate, source: MergeRequest });
+    }
+    if inputs.pipeline_source.as_deref() == Some("merge_request_event") {
+        bail!("merge-request diff base is not set");
+    }
+    // …显式指定的基点，再不行才落到本地候选
+}
+```
+
+第二个 `if` 是这段代码里最要紧的三行：**如果当前明确处在一次合并请求里，
+而基点却拿不到，它直接失败，不往下走回退链。**
+换句话说，回退链只在"没有权威答案"的场景下生效，
+而在"应该有权威答案却没拿到"的场景下它拒绝猜。
+
+这个区分很容易被写错，而写错的版本看起来更健壮 ——
+它在任何情况下都能给出一个基线，于是永远不会因为基线问题而失败。
+**而那正是问题所在**：一次合并请求里算错了基线，
+意味着"这次改了什么"算错了，于是跑的检查集合是错的，
+而输出仍然是绿的。**一个总能给出答案的函数，
+掩盖了它不该有答案的那些时刻。**
+
 而这和 @sec-cannot-judge 那条纪律并不矛盾，
 区别在于**基线是可以有合理默认值的，而判定不可以**：
 算不出基线时退回默认分支，最坏的结果是测多了；
