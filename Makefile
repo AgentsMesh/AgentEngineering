@@ -16,6 +16,7 @@ help:
 	@echo "make fix        自动修可修的（中文排版）"
 	@echo "make check-prose 行文形态（只报数，不拦）"
 	@echo "make check-tics  口头禅与加粗占比（已在 make check 里）"
+	@echo "make check-redundancy  跨章重述（已在 make check 里）"
 	@echo "make check-numbering 章节编号一致性（需要先 make html）"
 	@echo "make check-serve 逐页验证预览服务（需要 make serve 正在跑）"
 	@echo "make check-pdf-preflight  渲染 PDF 前的端口检查"
@@ -116,7 +117,7 @@ serve: tool-quarto stop-preview
 # ---------- 判定 ----------
 
 .PHONY: check
-check: check-typography check-xref check-budget check-terms check-claims check-concepts check-voice check-prose-strict check-tics
+check: check-typography check-xref check-budget check-terms check-claims check-concepts check-voice check-prose-strict check-tics check-redundancy
 	@echo "✓ 全部判定通过"
 
 # 基建自检：工具缺失是 exit 2，不是"你写错了"。
@@ -189,6 +190,12 @@ check-prose-strict: tool-python
 .PHONY: check-tics
 check-tics: tool-python
 	@python3 checks/tics.py
+
+# 车轱辘话：同一个论断在书里被完整重述。
+# 阈值按「清完存量之后剩多少」定，不按手感定 —— 见文件开头。
+.PHONY: check-redundancy
+check-redundancy: tool-python
+	@python3 checks/redundancy.py
 
 # 口吻：第三人称自指 + 答辩腔
 .PHONY: check-voice
