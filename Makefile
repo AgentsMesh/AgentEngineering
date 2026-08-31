@@ -17,6 +17,7 @@ help:
 	@echo "make check-prose 行文形态（只报数，不拦）"
 	@echo "make check-numbering 章节编号一致性（需要先 make html）"
 	@echo "make check-serve 逐页验证预览服务（需要 make serve 正在跑）"
+	@echo "make check-pdf-preflight  渲染 PDF 前的端口检查"
 	@echo "make wordcount  字数进度对照预算"
 	@echo "make html-only  只渲染网页 —— 会删掉 PDF 产物"
 	@echo "make pdf-only   只渲染 PDF —— 会删掉网页产物，serve 会 404"
@@ -33,22 +34,27 @@ PORT ?= 4200
 # 修法不是写一行注释提醒，是让单格式渲染不再是默认路径：
 # html 和 pdf 都渲染全部格式，代价是慢一点，换来的是没有一次渲染会毁掉另一半。
 # 真的只想要一种格式时用 html-only / pdf-only，它们的名字里写着后果。
-.PHONY: html pdf html-only pdf-only preview serve
+.PHONY: html pdf html-only pdf-only preview serve check-pdf-preflight
 html: build-all
 pdf: build-all
+
+# 渲染 PDF 之前先看一眼 9222 端口 —— 被占的话 quarto 会静默卡死。
+# 详见 checks/pdf_preflight.py 开头的说明。
+check-pdf-preflight: tool-python
+	@python3 checks/pdf_preflight.py
 
 html-only: tool-quarto
 	@echo "⚠️  这会删掉 _output 里已有的 PDF 产物"
 	quarto render --to html
 
-pdf-only: tool-quarto
+pdf-only: tool-quarto check-pdf-preflight
 	@echo "⚠️  这会删掉 _output 里已有的 HTML 产物，正在跑的 serve 会 404"
 	quarto render --to typst
 
 # 两种格式都构建 —— CI 跑这个，因为 preview 只看 HTML，
 # 而 PDF 那一侧的错误必须有地方能发现。
 .PHONY: build-all
-build-all: tool-quarto
+build-all: tool-quarto check-pdf-preflight
 	quarto render
 
 # 本机预览：只绑 127.0.0.1，自动开浏览器，改文件自动重渲染。
