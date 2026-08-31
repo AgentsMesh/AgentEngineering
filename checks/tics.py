@@ -6,15 +6,22 @@
 
 阈值不是拍脑袋定的，是拿源分享稿当对照组量出来的 ——
 同一个人、同一个领域、同一种语言、420 句，人写的。
-测出来的基线：句首「而」0.7% · 每 255 字一处加粗。
-书里最初的读数是 9.8% 和每 107 字一处，也就是 14 倍和 2.4 倍。
+测出来的基线：句首「而」0.7% · 被加粗的字占正文 6.1%。
+书里最初的读数是 9.8% 和 18.0%。
 
-阈值定在基线和当时读数之间，取一个够得着但确实要改的位置：
-句首「而」≤3.5% · 每 ≥150 字一处加粗 · 小节加粗收尾 ≤50%。
-不定成 0.7% 是因为那会变成另一种不自然 ——
+阈值：句首「而」≤3.5% · 被加粗字占比 ≤8%。
+不定成基线本身是因为那会变成另一种不自然 ——
 目标是去掉拐棍，不是模仿另一个人的呼吸。
 
-三条都是**跨章统计**，所以它们按全书判定，不逐章拦 ——
+这里原本还有第三条「小节以加粗句收尾的比例」，删掉了：
+它的第一版定义（末段里含加粗）在这本书上读出 76%，
+而按「末句整句加粗」重测是 0% —— 两个定义差了 76 个百分点，
+说明第一版量的是一个近乎恒真的东西，不是那个套路。
+换成有区分度的定义之后它和加粗占比是 2.4× 对 2.6×，
+基本同一个量的两种说法。一条和已有指标高度共线、
+又难以定义清楚的检查，留着只会制造噪声。修规则不修稿。
+
+两条都是跨章统计，所以它们按全书判定，不逐章拦 ——
 一章偶尔密一点不是问题，全书系统性地密才是。
 
 测量的坑（这条检查自己踩过一次）：书是硬换行的，
@@ -37,8 +44,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parent.parent
 
 MAX_ER_RATIO = 0.035        # 句首「而」占全部句子的比例上限
-MIN_CHARS_PER_BOLD = 150    # 平均每多少字才允许一处加粗
-MAX_BOLD_ENDING = 0.50      # 以加粗结尾的小节占比上限
+MAX_BOLD_CHAR_RATIO = 0.08  # 被加粗的字占正文的比例上限
 SENTINEL_MIN_SENTENCES = 2000   # 扫到的句子少于这个数，说明解析坏了
 
 
@@ -93,8 +99,7 @@ def main() -> int:
     all_sentences: list[str] = []
     prose_chars = 0
     bold_count = 0
-    sections_total = 0
-    sections_bold_end = 0
+    bold_chars = 0
     per_chapter: list[tuple[float, str, int]] = []
 
     for path in files:
@@ -103,15 +108,14 @@ def main() -> int:
         sents = sentences(paras)
         all_sentences += sents
 
+        # 逐文件量。把全书拼成一个字符串再匹配，会让某一章末尾的
+        # `**` 和下一章开头的 `**` 配成一对，匹配出跨章的巨大假区间 ——
+        # 那次的读数是 58%，逐文件量是 15.8%。
         stripped = strip_non_prose(raw)
-        prose_chars += len(re.sub(r"\s", "", stripped))
-        bold_count += len(re.findall(r"\*\*[^*]+\*\*", stripped))
-
-        for sec in re.split(r"\n#{2,4} ", stripped)[1:]:
-            blocks = [b.strip() for b in re.split(r"\n\s*\n", sec) if b.strip()]
-            sections_total += 1
-            if blocks and "**" in blocks[-1][-160:]:
-                sections_bold_end += 1
+        prose_chars += len(re.sub(r"\s", "", re.sub(r"\*", "", stripped)))
+        for b in re.findall(r"\*\*([^*]+)\*\*", stripped):
+            bold_count += 1
+            bold_chars += len(re.sub(r"\s", "", b))
 
         er = sum(1 for s in sents if s.startswith("而"))
         if sents:
@@ -127,30 +131,27 @@ def main() -> int:
 
     er_total = sum(1 for s in all_sentences if s.startswith("而"))
     er_ratio = er_total / len(all_sentences)
-    chars_per_bold = prose_chars // max(bold_count, 1)
-    bold_end_ratio = sections_bold_end / max(sections_total, 1)
+    bold_ratio = bold_chars / max(prose_chars, 1)
 
-    print(f"全书 {len(all_sentences):,} 句 / {prose_chars:,} 字（对照：源分享 420 句）\n")
+    print(f"全书 {len(all_sentences):,} 句 / {prose_chars:,} 字（对照：源分享 420 句 / 6.1%）\n")
     print(f"  句首「而」      {er_total:>5} 句   {er_ratio*100:>5.1f}%   上限 {MAX_ER_RATIO*100:.1f}%")
-    print(f"  加粗密度        {bold_count:>5} 处   每 {chars_per_bold} 字   下限 每 {MIN_CHARS_PER_BOLD} 字")
-    print(f"  加粗收尾的小节  {sections_bold_end:>5} 个   {bold_end_ratio*100:>5.1f}%   上限 {MAX_BOLD_ENDING*100:.0f}%")
+    print(f"  被加粗的字      {bold_count:>5} 处   {bold_ratio*100:>5.1f}%   上限 {MAX_BOLD_CHAR_RATIO*100:.0f}%")
 
     bad = []
     if er_ratio > MAX_ER_RATIO:
         bad.append("句首「而」过密")
-    if chars_per_bold < MIN_CHARS_PER_BOLD:
-        bad.append("加粗过密")
-    if bold_end_ratio > MAX_BOLD_ENDING:
-        bad.append("太多小节以加粗句收尾")
+    if bold_ratio > MAX_BOLD_CHAR_RATIO:
+        bad.append("加粗过多")
 
     if bad:
         print(f"\nguard: {' · '.join(bad)}", file=sys.stderr)
-        print("\n句首「而」最密的几章：", file=sys.stderr)
-        for ratio, name, count in sorted(per_chapter, reverse=True)[:6]:
-            print(f"  {name:<32}{count:>4} 句  {ratio*100:>5.1f}%", file=sys.stderr)
+        if er_ratio > MAX_ER_RATIO:
+            print("\n句首「而」最密的几章：", file=sys.stderr)
+            for ratio, name, count in sorted(per_chapter, reverse=True)[:6]:
+                print(f"  {name:<32}{count:>4} 句  {ratio*100:>5.1f}%", file=sys.stderr)
         return 1
 
-    print("\n✓ 口头禅: 句首「而」、加粗密度、加粗收尾三项都在阈值内")
+    print("\n✓ 口头禅: 句首「而」与加粗占比都在阈值内")
     return 0
 
 

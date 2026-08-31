@@ -36,7 +36,12 @@ LOOSE = {"index.qmd": 0.50, "chapters/05-appendix/d-glossary.qmd": 0.90}
 MIN_AVG_SENTENCES = 1.9
 MIN_CHARS_PER_BOLD = 110     # 平均多少字才允许一处加粗
 
-SKIP_PREFIX = ("#", "|", ">", "-", "*", ":::", "<!--", "```", "1.", "2.", "3.")
+# 注意 "*" 和 "-" 必须带空格才算列表标记。写成裸的 "*" 会把每一个
+# 以 **加粗** 开头的段落整段跳过 —— 而那恰好是最该被这条检查看住的
+# 那类段落（一句话、加粗、自成一段）。这条检查因此对它自己要抓的东西
+# 瞎了很久，直到一次变异验证把它照出来：注入一个加粗段落，段数不变；
+# 注入一个同样的普通段落，段数 +1。@sec-shape-a。
+SKIP_PREFIX = ("#", "|", ">", "- ", "* ", ":::", "<!--", "```", "1. ", "2. ", "3. ")
 
 
 def analyse(text: str) -> tuple[int, int, int, int]:
@@ -55,12 +60,18 @@ def analyse(text: str) -> tuple[int, int, int, int]:
         if body.rstrip().endswith(("：", ":")):
             continue
         paras += 1
-        n = len([x for x in re.split(r"[。？！]", body.replace("\n", "")) if x.strip()])
+        # 切句之前必须把行内标记剥掉。`**这是一句。**` 按原样切会得到
+        # ['**这是一句', '**'] —— 句号后面那个 `**` 被当成了第二句，
+        # 于是「整句加粗的单句段落」永远不会被算成单句段落。
+        # 这条检查因此对最该被它抓到的那类段落是瞎的，直到一次
+        # 去加粗的批量改动让它们现了形。@sec-shape-a：探针测的不是你以为的东西。
+        flat = re.sub(r"\*+|`|~~", "", body.replace("\n", ""))
+        n = len([x for x in re.split(r"[。？！]", flat) if x.strip()])
         sentences += n
         # 一个 60 字以上的长句不是碎片 —— 它承载了一段完整的推理，
         # 只是没有被句号切开（枚举、并列、带破折号的展开都是这样）。
         # 只按句数判会系统性地惩罚这种写法，而那是一次误报。
-        cjk = len(re.findall(r"[一-鿿]", body))
+        cjk = len(re.findall(r"[一-鿿]", flat))
         if n <= 1 and cjk < 60:
             singles += 1
         bolds += len(re.findall(r"\*\*", body)) // 2
