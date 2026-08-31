@@ -209,6 +209,34 @@ stateDiagram-v2
     end note
 ```
 
+"装配在锁外"这句话落到代码上，是把一次解析拆成了两半。
+第一半在锁内，它只做一件事 —— **原子地认领**：
+
+```swift
+private func beginResolution(for key: ServiceKey) -> GetServiceAction {
+    state.withLock { entries in
+        guard let entry = entries[key] else { return .notRegistered }
+        switch entry {
+        case .resolved(let service):  return .alreadyResolved(service)
+        case .pending(let assembly):
+            entries[key] = .assembling(assembly)   // ← 认领
+            return .needsAssembly(assembly)
+        case .assembling:             return .waitForOther
+        }
+    }
+}
+```
+
+注意这个函数**没有调用任何业务代码**，它只是读一个枚举、写一个枚举、
+返回一个决定。真正的装配发生在返回之后、锁已经放开的地方。
+而那个 `GetServiceAction` 枚举存在的唯一理由就是这个 ——
+它把"在锁内决定"和"在锁外执行"这两件事显式地分开，
+**而不是靠写代码的人记得别在锁里调用户代码。**
+
+这是 @sec-feedforward-levels 第三层的一个小例子：
+锁内的那段代码在类型上就够不着业务代码，
+因为它能返回的只有四个枚举值中的一个。
+
 写回的时候还有一道检查：`guard case .assembling = entries[key] else { return }` ——
 **只有在这个条目仍然属于本次装配时才发布结果。** 这防的是装配进行到一半时
 有人调用了 `reset()`（测试的清理路径），或者别的什么把这个条目清掉了 ——
