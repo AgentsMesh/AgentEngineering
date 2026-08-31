@@ -158,7 +158,7 @@ pub enum MonotonicComparison {
 它只会以那个错误的状态作为新基准 —— 债务凭空消失了一部分，
 而没有任何人会知道。
 
-## 一条规则长什么样 {#sec-rule-anatomy}
+## 规则长什么样 {#sec-rule-anatomy}
 
 （二十三条规则的全量清单在 @sec-appendix-rules，按「值得先抄哪条」分了三梯队。）
 
@@ -409,7 +409,7 @@ schema、glob、禁止模式、lane 选择、退出码、失败渲染都有契�
 检查器自己的代码不超过两百行每文件；而 **CI 的四道门**里
 有一道专门跑策略机制自身的契约。
 
-五层，而它们的成本是真实的 —— 这就是为什么检查器的代码量里
+五层，而它们的成本是真实的 —— 检查器的代码量里
 有相当一部分是它自己的测试。
 
 ### 但仍然有一处没被覆盖 {#sec-checker-gap}
@@ -459,7 +459,7 @@ schema、glob、禁止模式、lane 选择、退出码、失败渲染都有契�
 有没有被真实数据校准过（@sec-forbid-tuning）。
 
 结论：抄来的规则成本高，长出来的规则成本低。
-这也是为什么这一章从头到尾没有给出一份"推荐规则清单"。
+这一章从头到尾没有给出一份"推荐规则清单"，也是这个缘故。
 
 ### "Agent 会想办法绕过去" {#sec-objection-bypass}
 
@@ -515,7 +515,7 @@ schema、glob、禁止模式、lane 选择、退出码、失败渲染都有契�
 无法被单独抽出来，或者让一次重构的成本翻三倍。
 **延迟的代价是最容易被低估的那种。**
 
-这就是为什么"最常拦住人的那一层恰好也是最便宜的一层"不是巧合
+"最常拦住人的那一层恰好也是最便宜的一层"因此不是巧合
 （@sec-cheapest-layer）：结构问题多，是因为它们不产生即时反馈，
 所以在没有检查的情况下会持续累积。
 
@@ -576,7 +576,7 @@ guardrails: architecture failed: enforced architecture rule failed
 五步之间没有跳过的余地，每一步都在为下一步提供前提。
 特别是第一步：没有存量的数字，你无法判断第三步什么时候该做。
 
-## 一条规则的三种粒度 {#sec-rule-granularity}
+## 规则的三种粒度 {#sec-rule-granularity}
 
 同一个意图可以被写成三种粒度的规则，而它们的性质完全不同。
 
@@ -675,7 +675,7 @@ guardrails: architecture failed: enforced architecture rule failed
 如果你想不起来是哪一句，说明现在还不该做这一层 ——
 这一层守的是已经付出过代价的约定，而不是你希望团队遵守的理想。
 
-## 一个关于"检查器该多严"的判断 {#sec-how-strict}
+## 检查器该多严 {#sec-how-strict}
 
 最后回答一个必然会被问的问题。**判据不是"严不严"，是"误报率"。**
 
@@ -720,7 +720,7 @@ guardrails: architecture failed: enforced architecture rule failed
 **三个错误的共同点**是它们都不会立刻造成明显的后果，
 而它们会在几个月内让这一层失去作用。
 
-## 一个关于规则数量的参照 {#sec-rule-count-reference}
+## 规则数量的参照 {#sec-rule-count-reference}
 
 给一个粗略的参照，帮读者判断自己的规模：
 

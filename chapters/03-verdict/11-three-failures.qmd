@@ -128,7 +128,7 @@ outcomes must be unique")` —— **一个 lane 只能有一个判定。**
 如果同一个 lane 能写两次结论，那么"这次到底过了没有"就取决于谁最后写，
 而这正是形状 B。
 
-## 一次真的 exit 2 长什么样 {#sec-real-exit-2}
+## 真的 exit 2 长什么样 {#sec-real-exit-2}
 
 ```
 $ bash guardrails/guard check arbiters
@@ -378,7 +378,7 @@ fail closed 的意思是：判不了等于不通过。
 
 这是全书投入最小、收益最确定的一条改动：**半天，一个退出码。**
 
-### 一个更细的分类练习 {#sec-classification-exercise}
+### 更细的分类练习 {#sec-classification-exercise}
 
 如果你想做得更彻底，对每一次红灯记四个字段：哪一层（测试/结构/路径不变量）、
 哪一类（真违规/基建故障）、定位花了多久（从看到红灯到知道原因）、
