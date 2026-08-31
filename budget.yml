@@ -6,7 +6,7 @@
 #
 # 改预算是一个决定，单独一个 commit，不许和写作混在一起。
 
-total: 200000
+total: 186600
 tolerance: 0.20
 
 chapters:
@@ -18,16 +18,16 @@ chapters:
   "chapters/01-problem/04-seven-shapes.qmd":              9900
 
   "chapters/02-environment/05-environment-first.qmd":     5300
-  "chapters/02-environment/06-codebase.qmd":              11800
-  "chapters/02-environment/07-architecture.qmd":          11800
-  "chapters/02-environment/08-carriers.qmd":             13100
-  "chapters/02-environment/09-toolchain.qmd":             11800
+  "chapters/02-environment/06-codebase.qmd":              10000
+  "chapters/02-environment/07-architecture.qmd":          10000
+  "chapters/02-environment/08-carriers.qmd":             11000
+  "chapters/02-environment/09-toolchain.qmd":             10000
   "chapters/02-environment/10-small-scale-environment.qmd": 9200
 
   "chapters/03-verdict/11-three-failures.qmd":            5300
-  "chapters/03-verdict/12-tests.qmd":                    13100
-  "chapters/03-verdict/13-guardrails.qmd":               13100
-  "chapters/03-verdict/14-arbiter.qmd":                   11800
+  "chapters/03-verdict/12-tests.qmd":                    11000
+  "chapters/03-verdict/13-guardrails.qmd":               11000
+  "chapters/03-verdict/14-arbiter.qmd":                   10000
   "chapters/03-verdict/15-rule-lifecycle.qmd":            9200
   "chapters/03-verdict/16-small-scale-verdict.qmd":       6600
 
