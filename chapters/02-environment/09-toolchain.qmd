@@ -79,6 +79,47 @@ flowchart LR
 场景下不是优化，是必需品：260 个工作区如果各自去连同一台测试机，
 得到的不是"慢"，是"全都连不上"。
 
+### 第三处：所有可调阈值集中在一个地方 {#sec-tool-policy}
+
+还有一处值得单独看，因为它把 @sec-policy-mechanism 那条纪律
+用在了工具自己身上。这个工具的策略模块开头写着一句：
+"所有可调阈值集中在此，不散落在通路里"，紧接着列出了四个注入点 ——
+重连、健康检查、发现、编排，各自注入到哪个组件。
+
+其中重连那一组长这样：
+
+```rust
+pub struct Reconnect {
+    pub max_attempts: u32,   // 同一 Endpoint 内的最大重试次数
+    pub base_delay: Duration,
+    pub max_delay: Duration, // 指数退避上限
+    pub factor: f64,
+    pub cooldown: Duration,  // 期满后 reconciler tick 自醒
+}
+
+impl Reconnect {
+    pub fn delay_for(&self, attempt: u32) -> Duration {
+        let raw = self.base_delay.as_millis() as f64
+            * self.factor.powi(attempt as i32);
+        Duration::from_millis(raw.min(self.max_delay.as_millis() as f64) as u64)
+    }
+}
+```
+
+三件事值得注意。**`max_delay` 那个上限是形状 F 的解药**——
+一个没有上限的指数退避，在设备长时间不在的时候会退避到几小时，
+而那时候即使设备回来了它也不会重连。
+**`max_attempts` 加 `cooldown` 是抗积分饱和**：
+达到上限之后不是无限重试下去，是进入一个有期限的冷却，
+期满自醒 —— 这正是 @sec-cross-session 讲的那个模式，
+只不过这次出现在设备连接上。
+
+而第三件最要紧：**这五个数全都在一个结构体里，
+而不是散在重连逻辑的各处。** 它带来的差别是，
+当有人问"我们的重连策略是什么"时，答案是一个可以被完整读完的类型，
+不是一次跨五个文件的搜索。**对 Agent 来说这个差别更大**——
+它不会去跨五个文件拼一个策略，它只会看它当下读到的那一处。
+
 ## 但工具会制造它自己的假象 {#sec-tool-illusion}
 
 这一节是这一章最重要的一节。
