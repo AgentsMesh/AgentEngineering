@@ -347,7 +347,7 @@ Agent 很擅长写出一个"看起来在做这件事"的定时任务，而如果
 不够好用可以包一层；够不着才必须造，
 而够不着的东西通常比想象中少。
 
-## 这一章的结论 {#sec-toolchain-conclusion}
+## 结论 {#sec-toolchain-conclusion}
 
 **给 Agent 造工具，难的不是让它能点。**
 
@@ -609,7 +609,7 @@ Agent 知道失败了但不知道为什么；报"没有设备连接"才是正确
 （@sec-signing-failure）。这一条的成本是三分钟的思考，
 而它防住的是一整类不可观测的缺口。
 
-## 这一章的一句话 {#sec-toolchain-oneline}
+## 压成一句话 {#sec-toolchain-oneline}
 
 前三块环境降低 Agent 做错的概率，
 这一块决定它能不能知道自己做对了。
@@ -637,7 +637,7 @@ Agent 知道失败了但不知道为什么；报"没有设备连接"才是正确
 不是因为有人决定跳过，而是因为**不跳过需要额外的动作**。
 所以在不可逆的动作上保留摩擦，是一个设计选择，不是一个遗留问题。
 
-## 这一章和第七章的一处矛盾 {#sec-apparent-contradiction}
+## 和第七章的一处矛盾 {#sec-apparent-contradiction}
 
 @sec-delivery 讲交付期时说"触发权收敛到唯一入口"，
 而这一章讲工具时说"给 Agent 更多能力"。

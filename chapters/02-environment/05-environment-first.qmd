@@ -299,7 +299,7 @@ flowchart TB
 一个只有前馈的系统在遇到第一个新问题时就失效了，
 而它甚至不知道自己失效了 —— 因为没有东西在测量。
 
-## 这一部怎么读 {#sec-part-two-reading}
+## 这一部的读法 {#sec-part-two-reading}
 
 四章的顺序不是重要性排序，是依赖顺序。@sec-codebase 定义"东西放在哪"，
 那是后面所有讨论的坐标系；@sec-architecture 定义"东西之间怎么连"，
@@ -312,7 +312,7 @@ flowchart TB
 如果你的团队还很小，跳过 @sec-depgraph 那一节，那是这一部里
 唯一需要重基建的地方。
 
-## 这一部的四章各自能被压成一句 {#sec-part-two-oneliners}
+## 四章各自压成一句 {#sec-part-two-oneliners}
 
 作为导航，先把四个结论给出来，读完之后再回来对照：
 

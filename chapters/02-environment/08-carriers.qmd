@@ -710,7 +710,7 @@ guide 依赖"Agent 想起来查"，而那是一个概率事件。
 
 三个问题，而大部分团队只能答第一个。
 
-## 这一章能被压成的三句话 {#sec-carriers-three-lines}
+## 压成三句话 {#sec-carriers-three-lines}
 
 一、问题不是"这条规则重不重要"，是"它什么时候需要到达"。
 

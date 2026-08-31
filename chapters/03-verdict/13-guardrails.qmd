@@ -768,7 +768,7 @@ guardrails: architecture failed: enforced architecture rule failed
 先检查其中有多少是能被自动修掉的 ——
 把那些挪走之后剩下的那几条，才是这一层真正的对象。
 
-## 这一章能被压成的三句话 {#sec-guardrails-three-lines}
+## 压成三句话 {#sec-guardrails-three-lines}
 
 一、最常拦住人的那一层，恰好也是最便宜的一层。而这不是巧合
 （@sec-high-failure-good）：结构问题不产生即时反馈，

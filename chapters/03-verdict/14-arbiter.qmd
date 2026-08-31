@@ -668,7 +668,7 @@ Agent 会换个写法绕过去，因为它不知道守的是什么（@sec-read-f
 所以这一层的规则集会比结构检查那一层的更稳定，也更少退休。
 这是它的性质，不是它的问题。
 
-## 这一层能被压成的三句话 {#sec-arbiter-three-lines}
+## 压成三句话 {#sec-arbiter-three-lines}
 
 一、问题从"归谁审"换成了"必须保持什么"。而这个转换的价值在于
 后者不依赖任何人在场（@sec-different-question），
