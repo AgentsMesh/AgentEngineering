@@ -36,6 +36,11 @@ def main() -> int:
         labels.update(re.findall(r"\{#(sec-[A-Za-z0-9_-]+)", body))
 
     problems, ghosts = [], []
+    # mermaid 图里的标签不是正文散文 —— 一张图里出现某个术语，
+    # 不构成"读者需要在这里拿到指针"。把图块整体剔掉再找首次出现。
+    text = {rel: re.sub(r"```\{mermaid\}.*?```", "", body, flags=re.S)
+            for rel, body in text.items()}
+
     for item in CONCEPTS:
         term, anchor = item["term"], item["anchor"]
         if anchor not in labels:
