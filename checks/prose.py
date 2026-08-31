@@ -26,6 +26,10 @@ BUDGET = yaml.safe_load((ROOT / "budget.yml").read_text(encoding="utf-8"))
 
 SENTINEL_MIN = 20
 MAX_SINGLE_RATIO = 0.35      # 单句段落占比上限
+# 导航/索引性质的章节例外：前言的「我不讲什么」、术语表的词条辨析，
+# 它们本来就是并列的短条目，硬合并成长段会更难读。
+# 豁免写明理由，而不是把全局阈值放松 —— 见正文 @sec-allow-files。
+LOOSE = {"index.qmd": 0.50, "chapters/05-appendix/d-glossary.qmd": 0.90}
 MIN_AVG_SENTENCES = 2.0      # 平均句数下界
 MIN_CHARS_PER_BOLD = 110     # 平均多少字才允许一处加粗
 
@@ -41,6 +45,11 @@ def analyse(text: str) -> tuple[int, int, int, int]:
     for block in re.split(r"\n\s*\n", text):
         body = block.strip()
         if not body or body.startswith(SKIP_PREFIX):
+            continue
+        # 以冒号结尾的引导句（"三个原因："「这个模型是这么说的：」）
+        # 是下文的一部分，不是一个独立段落。把它算成单句段落会
+        # 系统性地惩罚正常的写法 —— 这是一次误报，修规则不修稿。
+        if body.rstrip().endswith(("：", ":")):
             continue
         paras += 1
         n = len([x for x in re.split(r"[。？！]", body.replace("\n", "")) if x.strip()])
@@ -67,8 +76,9 @@ def main() -> int:
         ratio = singles / paras
         avg = sents / paras
         per_bold = chars // bolds if bolds else 9999
-        bad = (ratio > MAX_SINGLE_RATIO or avg < MIN_AVG_SENTENCES
-               or per_bold < MIN_CHARS_PER_BOLD)
+        limit = LOOSE.get(rel, MAX_SINGLE_RATIO)
+        floor = 1.5 if rel in LOOSE else MIN_AVG_SENTENCES
+        bad = (ratio > limit or avg < floor or per_bold < MIN_CHARS_PER_BOLD)
         rows.append((rel, paras, ratio, avg, per_bold, bad))
         if bad:
             failed.append(rel)
