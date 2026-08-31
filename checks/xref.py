@@ -12,6 +12,13 @@
 
 重复锚点的实际后果是渲染层静默选一个：读者点一次交叉引用，
 跳到的可能是写的人没打算给他看的那一节，而没有任何东西会报错。
+
+行内代码（`@sec-xxx` 这种反引号里的）不算引用。一本讲交叉引用的书
+必然要把引用的**写法**当成例子写出来，而那不是一次引用 ——
+这正是正文 @sec-source-view 讲的"规则被自己的文档绊倒"：
+不排除它，这条检查会在第 18 章那段讲它自己的文字上误报，
+然后被绕过（@sec-bypass）。Quarto 也不解析代码里的引用，
+所以这个排除和渲染行为是一致的，不是为了让检查过而开的口子。
 """
 import re
 import sys
@@ -19,6 +26,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 REF = re.compile(r"@(sec|fig|tbl|eq)-([A-Za-z0-9_-]+)")
+INLINE_CODE = re.compile(r"`[^`]*`")
 LABEL = re.compile(r"\{#(sec|fig|tbl|eq)-([A-Za-z0-9_-]+)[^}]*\}")
 
 
@@ -35,7 +43,7 @@ def main() -> int:
                 key = f"{kind}-{name}"
                 labels[key] = path
                 seen.setdefault(key, []).append((path, lineno))
-            for kind, name in REF.findall(line):
+            for kind, name in REF.findall(INLINE_CODE.sub("", line)):
                 refs.append((f"{kind}-{name}", path, lineno))
 
     dangling = [(r, p, n) for r, p, n in refs if r not in labels]
