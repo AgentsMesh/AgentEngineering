@@ -15,6 +15,7 @@ help:
 	@echo "make check      全部判定（= CI 跑的东西）"
 	@echo "make fix        自动修可修的（中文排版）"
 	@echo "make check-prose 行文形态（只报数，不拦）"
+	@echo "make check-tics  口头禅与结构套路（只报数，不拦）"
 	@echo "make check-numbering 章节编号一致性（需要先 make html）"
 	@echo "make check-serve 逐页验证预览服务（需要 make serve 正在跑）"
 	@echo "make check-pdf-preflight  渲染 PDF 前的端口检查"
@@ -141,6 +142,13 @@ check-prose: tool-python
 
 check-prose-strict: tool-python
 	@python3 checks/prose.py --strict
+
+# 口头禅与结构套路（俗称「AI 味」）。阈值拿源分享稿当对照组量出来。
+# 报数模式 —— 存量正在清（句首「而」454 句 → 目标 ≤3.5%）。
+# 清完切拦截，和 check-prose 走过的路一样。
+.PHONY: check-tics
+check-tics: tool-python
+	@python3 checks/tics.py || true
 
 # 口吻：第三人称自指 + 答辩腔
 .PHONY: check-voice
