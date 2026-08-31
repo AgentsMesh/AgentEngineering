@@ -34,7 +34,12 @@ LOOSE = {"index.qmd": 0.50, "chapters/05-appendix/d-glossary.qmd": 0.90}
 # 复合句承载的推理不比两个短句少 —— 单句段落占比才是那个真正的信号，
 # 均句只是它的辅助。定得太高会逼人把长句拆碎，那是反效果。
 MIN_AVG_SENTENCES = 1.9
-MIN_CHARS_PER_BOLD = 110     # 平均多少字才允许一处加粗
+# 加粗这一项挪到 checks/tics.py 了。理由是两条检查在量同一件事，
+# 而这里量得更差：按「处数」算密度，一处两个字的术语标签
+# 和一处四十字的整句加粗算同一处。tics.py 按「被加粗的字占正文的比例」量，
+# 并且拿源分享稿校准过（6.1%）。两条共线的检查里留下定义更清楚的那条，
+# 是 @sec-rules-that-shouldnt 的第三条：重叠的规则说明背后那条原则没被找出来。
+
 
 # 注意 "*" 和 "-" 必须带空格才算列表标记。写成裸的 "*" 会把每一个
 # 以 **加粗** 开头的段落整段跳过 —— 而那恰好是最该被这条检查看住的
@@ -96,7 +101,7 @@ def main() -> int:
         per_bold = chars // bolds if bolds else 9999
         limit = LOOSE.get(rel, MAX_SINGLE_RATIO)
         floor = 1.5 if rel in LOOSE else MIN_AVG_SENTENCES
-        bad = (ratio > limit or avg < floor or per_bold < MIN_CHARS_PER_BOLD)
+        bad = (ratio > limit or avg < floor)
         rows.append((rel, paras, ratio, avg, per_bold, bad))
         if bad:
             failed.append(rel)
@@ -110,8 +115,8 @@ def main() -> int:
               f"{avg:>6.1f} {pb:>7}  {'✗' if bad else '✓'}")
 
     print("-" * (width + 36))
-    print(f"阈值：单句 ≤{MAX_SINGLE_RATIO:.0%}，均句 ≥{MIN_AVG_SENTENCES}，"
-          f"每 ≥{MIN_CHARS_PER_BOLD} 字一处加粗")
+    print(f"阈值：单句 ≤{MAX_SINGLE_RATIO:.0%}，均句 ≥{MIN_AVG_SENTENCES}"
+          "（「字/粗」只报数不判定，加粗归 checks/tics.py 管）")
 
     if failed and strict:
         print(f"\nguard: {len(failed)} 章行文不达标", file=sys.stderr)

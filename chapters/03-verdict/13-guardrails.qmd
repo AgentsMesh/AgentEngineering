@@ -114,7 +114,6 @@ pub struct FingerprintMultiset {
 同一个文件里还有一句 `if fingerprint.is_empty() { bail!(...) }`：
 空指纹被直接拒绝，因为一个空指纹会匹配所有东西，
 它会让台账变成一张万能通行证。
-
 这两个细节的共同点是：它们防的都不是"有人故意作弊"，
 而是"一个看起来无害的实现选择，悄悄打开了一个口子"。
 
@@ -309,7 +308,6 @@ guardrails: architecture failed: enforced architecture rule failed
 
 注意两行的对比：一条规则有 **966 处**违规，检查照样往下走；
 另一条只有 **1 处**，直接把这条流水线拦掉了。
-
 一条规则拦不拦人，跟它违规多少无关，只跟它是不是 enforced 有关。
 
 这份输出还顺带把前面几节讲的东西摆在了台面上：每条规则后面的 `scanned` 数
