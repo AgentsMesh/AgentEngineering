@@ -63,15 +63,29 @@ build-all: tool-quarto check-pdf-preflight
 # 于是 PDF 那一侧的任何错误（缺一个 Typst 函数就够了）
 # 会让整个预览显示一个空白的 render error —— 而 HTML 本身是好的。
 # 一次判定失败不该污染另一次判定。
+# 起预览，等它就绪，自动验一遍 26 页，然后把预览留在前台。
+# 不自动验的话，一个陈掉的预览可以静默地服务十几个小时的空 error 页
+# —— 那次的磁盘产物一直是好的，坏的只有预览进程自己的状态。
 preview: tool-quarto
-	quarto preview --to html --port $(PORT)
+	@quarto preview --to html --port $(PORT) --no-browser & \
+	 pid=$$!; \
+	 n=0; until curl -s http://127.0.0.1:$(PORT)/ 2>/dev/null | head -c 3000 | grep -q .; do \
+	   n=$$((n+1)); [ $$n -gt 90 ] && break; sleep 2; done; \
+	 python3 checks/serve.py || echo "⚠️  预览起来了但页面不对 —— 上面有明细"; \
+	 echo "预览在 http://127.0.0.1:$(PORT)/  （Ctrl-C 停）"; \
+	 wait $$pid
 
 # 局域网预览：绑全部网卡，同一个 Wi-Fi 下的手机/平板/别的机器都能看
 # 注意这会把这本书暴露给同网段的所有设备。
 serve: tool-quarto
 	@ip=$$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo 127.0.0.1); \
 	echo "局域网地址: http://$$ip:$(PORT)"; \
-	quarto preview --to html --host 0.0.0.0 --port $(PORT) --no-browser
+	quarto preview --to html --host 0.0.0.0 --port $(PORT) --no-browser & \
+	pid=$$!; \
+	n=0; until curl -s http://127.0.0.1:$(PORT)/ 2>/dev/null | head -c 3000 | grep -q .; do \
+	  n=$$((n+1)); [ $$n -gt 90 ] && break; sleep 2; done; \
+	python3 checks/serve.py || echo "⚠️  预览起来了但页面不对 —— 上面有明细"; \
+	wait $$pid
 
 # ---------- 判定 ----------
 
