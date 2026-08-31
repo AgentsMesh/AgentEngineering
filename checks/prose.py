@@ -54,7 +54,11 @@ def analyse(text: str) -> tuple[int, int, int, int]:
         paras += 1
         n = len([x for x in re.split(r"[。？！]", body.replace("\n", "")) if x.strip()])
         sentences += n
-        if n <= 1:
+        # 一个 60 字以上的长句不是碎片 —— 它承载了一段完整的推理，
+        # 只是没有被句号切开（枚举、并列、带破折号的展开都是这样）。
+        # 只按句数判会系统性地惩罚这种写法，而那是一次误报。
+        cjk = len(re.findall(r"[一-鿿]", body))
+        if n <= 1 and cjk < 60:
             singles += 1
         bolds += len(re.findall(r"\*\*", body)) // 2
     chars = len(re.findall(r"[一-鿿]", text))
