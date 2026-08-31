@@ -7,8 +7,8 @@ CHAPTERS := $(shell find chapters -name '*.qmd' 2>/dev/null)
 
 .PHONY: help
 help:
-	@echo "make html       构建网页版"
-	@echo "make pdf        构建 PDF（Typst）"
+	@echo "make html       构建全书（网页 + PDF，互不覆盖）"
+	@echo "make pdf        同上 —— 两个目标现在是一回事，见 Makefile 里的说明"
 	@echo "make build-all  两种格式都构建（CI 跑这个）"
 	@echo "make preview    本机实时预览（localhost）"
 	@echo "make serve      局域网实时预览（手机也能看）"
@@ -18,17 +18,31 @@ help:
 	@echo "make check-numbering 章节编号一致性（需要先 make html）"
 	@echo "make check-serve 逐页验证预览服务（需要 make serve 正在跑）"
 	@echo "make wordcount  字数进度对照预算"
+	@echo "make html-only  只渲染网页 —— 会删掉 PDF 产物"
+	@echo "make pdf-only   只渲染 PDF —— 会删掉网页产物，serve 会 404"
 
 # ---------- 构建 ----------
 
 # 预览端口。改这个值可以同时开多个预览。
 PORT ?= 4200
 
-.PHONY: html pdf preview serve
-html: tool-quarto
+# ⚠️ quarto 在每次 render 开始时会清空 output-dir，而两种格式共用 _output。
+# 所以 `quarto render --to typst` 会先把 HTML 产物全删掉，再产出 PDF ——
+# 正在跑的 `make serve` 于是开始 404，而没有任何东西报错。
+# 这是形状 D 的一个实例：一个动作的副作用发生在它声明的范围之外。
+# 修法不是写一行注释提醒，是让单格式渲染不再是默认路径：
+# html 和 pdf 都渲染全部格式，代价是慢一点，换来的是没有一次渲染会毁掉另一半。
+# 真的只想要一种格式时用 html-only / pdf-only，它们的名字里写着后果。
+.PHONY: html pdf html-only pdf-only preview serve
+html: build-all
+pdf: build-all
+
+html-only: tool-quarto
+	@echo "⚠️  这会删掉 _output 里已有的 PDF 产物"
 	quarto render --to html
 
-pdf: tool-quarto
+pdf-only: tool-quarto
+	@echo "⚠️  这会删掉 _output 里已有的 HTML 产物，正在跑的 serve 会 404"
 	quarto render --to typst
 
 # 两种格式都构建 —— CI 跑这个，因为 preview 只看 HTML，
