@@ -324,17 +324,61 @@ flake 的典型形状是这样的：要断言一个最终一致的异步副作�
 
 ## 两条专门用来防"测试看起来通过了"的规则 {#sec-anti-fake-rules}
 
-@sec-unconditional-skip 讲了第一条。第二条更具体：它匹配"点到成功为止"
-这一类重试点击的辅助函数，而规则的说明是这类辅助函数会把一次就绪延迟
-升级成重复交易，还会在按钮消失动画期间触发测试框架的异常。
-修法是删掉这些辅助函数，改用一个只提交一次购买意图的契约方法。
+这两条规则的完整定义值得摆出来，因为它们是"绿灯的可信度需要独立守卫"
+这句话最具体的形态。
 
-**这两处代码的共同点是：它们都能编译、都能跑、CI 全绿。**
+```toml
+[[rule]]
+id = "UI-E2E-NO-CONSTANT-SKIP-CONDITION"
+kind = "forbid_pattern"
+enforce = true
+scope = ["Products/*/UITests/**/*.swift"]
+source_view = "code_only"
+pattern = '(?:XCTSkipIf\s*\(\s*true\b|XCTSkipUnless\s*\(\s*false\b)'
+sentinel_min = 50
+incident = "无条件 XCTSkipIf(true)/XCTSkipUnless(false) 永久删除了覆盖却仍保留测试外观"
+fix_hint = "修复并启用场景；真实运行时限制使用有依据的条件 skip"
+
+[[rule]]
+id = "PAYWALL-E2E-NO-RETRY-TAP-HELPERS"
+kind = "forbid_pattern"
+enforce = true
+scope = ["Products/*/UITests/**/*Paywall*.swift"]
+pattern = '\b(?:tapCTAUntil|tapSubscribeUntil|tapStartUntil)\s*\('
+sentinel_min = 20
+incident = "已知 Paywall retry-tap helper 会把一次就绪延迟升级成重复交易，并在 CTA 消失动画期间触发 XCUITest ObjC 异常"
+fix_hint = "删除 tapCTAUntil/tapSubscribeUntil/tapStartUntil；通过 PaywallContract.tapCTAOnceAndWait 只提交一次购买意图"
+```
+
+第一条盯的是无条件跳过。注意那个正则只匹配**常量条件**——
+`XCTSkipIf(true)` 和 `XCTSkipUnless(false)`，
+而不是所有的 skip。这个边界是刻意的：
+**真实的运行时限制（这台机器没有摄像头、这个系统版本不支持某个 API）
+是合法的跳过理由**，禁掉它会在正确的工作上误报，
+然后这条规则会被绕过（@sec-forbid-tuning）。
+`incident` 那句话把这条规则的全部理由压成了一行 ——
+**它永久删除了覆盖，却仍保留测试外观。**
+
+第二条盯的是"点到成功为止"这类重试点击的辅助函数。
+`incident` 里写了两个后果，而它们的性质完全不同：
+一个是**业务后果**（把一次就绪延迟升级成重复交易，也就是重复扣款），
+一个是**技术后果**（在按钮消失动画期间触发测试框架的异常，
+表现为 flake）。而 `fix_hint` 不只是说"别用"，
+它指出了替代品的名字 —— `tapCTAOnceAndWait`，
+一个只提交一次购买意图的契约方法。
+
+**这两处代码的共同点是它们都能编译、都能跑、CI 全绿。**
 而人在评审里几乎不可能从一个叫"点到订阅成功为止"的函数名
-联想到"这会重复扣款"。
+联想到"这会重复扣款"。它们也不是代码风格问题 ——
+**它们是用测试的外观掩盖了覆盖的消失**，
+而这正是"绿灯到底可不可信"必须有一层独立守卫的原因。
 
-它们也不是代码风格问题 —— **它们是用测试的外观掩盖了覆盖的消失。**
-这正是"绿灯到底可不可信"必须有一层独立守卫的原因。
+还有一处细节值得学：**两条规则的 `scope` 精度不一样。**
+第一条覆盖所有界面测试，第二条只覆盖文件名里带 Paywall 的那些。
+后者更窄，因为那个问题只在支付路径上有业务后果 ——
+**而窄的 scope 直接降低了误报的可能，
+也让 `sentinel_min` 可以设成一个更小但更有意义的数（20 而不是 50）。**
+一条规则的 scope 不是"能覆盖多少"，是"在哪些地方这条不变量真的成立"。
 
 ## 测试金字塔在 Agent 场景下的形变 {#sec-pyramid-deformed}
 
