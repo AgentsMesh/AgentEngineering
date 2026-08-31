@@ -6,3 +6,8 @@ __pycache__/
 
 /.quarto/
 **/*.quarto_ipynb
+
+# 单文件渲染（quarto render <file>）会把产物吐在仓库根，不进 _output
+index.html
+site_libs/
+chapters/**/*.html
