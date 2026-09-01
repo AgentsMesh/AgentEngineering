@@ -75,9 +75,15 @@ format:
       bottom: 2cm
       left: 2cm
       right: 2cm
-    mainfont: "Source Han Serif SC"
-    sansfont: "Source Han Sans SC"
-    monofont: "Sarasa Mono SC"
+    # 用 macOS 自带的中文字体。原本配的是思源黑/宋 + 更纱黑体，
+    # 但那三个在这台机器上一个都没装，而 Typst 找不到字体时是**静默回退**的 ——
+    # PDF 照出，排版不受控，而且不会有任何一行警告。
+    # 这正是形状 D（配置声明了但从未生效）在排版上的形态，
+    # 所以这里只配确定存在的：Songti SC / PingFang SC / Menlo。
+    # 想换回思源，装好字体再改这三行。
+    mainfont: "Songti SC"
+    sansfont: "PingFang SC"
+    monofont: "Menlo"
     fontsize: 10pt
     section-numbering: "1.1.1"
     template-partials:

@@ -92,6 +92,13 @@ Agent 把产出那一侧的成本压掉了一个数量级，判定那一侧没�
 遇到不认识的词翻 @sec-appendix-glossary，
 那里按「你在什么情况下会需要它」重新索引了一遍。
 
+书的源码在 <https://github.com/AgentsMesh/AgentEngineering>，
+网页版在 <https://agentsmesh.github.io/AgentEngineering/>。
+里面还有一样东西值得顺手看一眼：`checks/` 那十来个脚本。
+那是我用在自己稿子上的判定 —— 每一个文件开头都写着
+它为什么存在、以及它踩过什么坑。下面讲的每一条纪律，
+在那个目录里都有一个能跑、会失败的对应物。
+
 ## 我不讲什么
 
 **提示词怎么写。** 它重要，但不是这里的问题 ——
