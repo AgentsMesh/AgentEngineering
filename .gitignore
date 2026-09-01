@@ -11,3 +11,7 @@ __pycache__/
 index.html
 site_libs/
 chapters/**/*.html
+
+# typst 渲染的中间产物
+*.typ
+!includes/*.typ

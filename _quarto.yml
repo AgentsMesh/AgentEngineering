@@ -5,8 +5,12 @@ project:
 book:
   title: "让不确定的 Agent 产出确定性的结果"
   subtitle: "用确定性的基建，把不确定的 Agent 包围起来"
-  author: "yishuiliunian"
-  date: today
+  author:
+    - name: "yishuiliunian"
+      email: "yishuiliunian@gmail.com"
+  # 不写 date：`date: today` 会把渲染那天的日期印在扉页上，
+  # 每构建一次就换一个日期 —— 而正文里刚把这类「给书打日期」的写法
+  # 全部清掉了（见 voice.yml 第三组规则），扉页不该再破例。
 
   # 章节顺序是 SSOT —— 任何地方引用章节都用 @sec- 交叉引用，不写死编号
   chapters:
