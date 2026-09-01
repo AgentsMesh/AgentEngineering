@@ -1,8 +1,22 @@
 #!/usr/bin/env python3
 """PDF 渲染的前置条件检查。
 
-为什么需要它：quarto 在渲染 PDF 时要把 mermaid 图转成图片，
-而它的做法是拉起一个 headless Chrome 并连到**固定端口 9222**。
+⚠️ 这条检查的前提是错的，留着是因为它记录了一次典型的探针错误。
+
+原本的说法是「quarto 连固定端口 9222」。实测不是 —— 它**动态选端口**，
+那次实际用的是 3900。也就是说这条检查从写下来起就在查一个不相干的条件，
+而它一直是绿的，看起来像在保护什么。
+
+真正让 PDF 渲染卡死二十分钟的是别的：**上几次没退干净的 quarto/deno 进程**。
+清掉之后同一份稿子十几秒就渲完了。所以有效的动作是下面的清理那一段，
+不是端口判断那一段。
+
+保留它的理由：这是一个「探针测的不是你以为的东西」的现成实例，
+而且它比正文里任何一个例子都典型 —— 我不但测错了量，
+还围着那个错的量写了一整篇说明。
+
+原说法：quarto 在渲染 PDF 时要把 mermaid 图转成图片，
+做法是拉起 headless Chrome 并连到固定端口 9222。
 如果这台机器上已经有别的进程占着 9222，quarto 会连上那个进程、
 发出它不认识的协议消息，然后**无限等待一个永远不会来的回复** ——
 不报错、不超时、CPU 占用为零。
@@ -25,6 +39,7 @@
 import re
 import subprocess
 import sys
+import time
 
 PORT = 9222
 
@@ -71,9 +86,27 @@ def main() -> int:
         print(f"✓ PDF 前置条件: 端口 {PORT} 空闲，mermaid 转图可以拉起浏览器")
         return 0
 
+    stale = [(pid, name) for pid, name in holders if QUARTO_CHROME.search(cmdline(pid))]
     foreign = [(pid, name) for pid, name in holders if not QUARTO_CHROME.search(cmdline(pid))]
-    if not foreign:
-        print(f"✓ PDF 前置条件: 端口 {PORT} 上只有上次渲染残留的 headless Chrome，quarto 会复用或重启它")
+
+    # 上一版在这里返回 0，理由是「quarto 会复用或重启它」。它不会。
+    # 一次渲染卡在第 14 章卡了二十分钟，CPU 全程 0%，
+    # 而 9222 上蹲着的正是二十三小时前那次渲染留下的 Chrome。
+    # 「残留的是自己人所以没关系」是一个想当然的豁免 ——
+    # 它把这条检查在最需要它的那种情况下变成了绿的。
+    # 现在的做法是把残留清掉，清不掉才报故障。
+    if stale and not foreign:
+        for pid, _ in stale:
+            print(f"清理上次渲染残留的 headless Chrome（pid {pid}）")
+            try:
+                subprocess.run(["kill", pid], timeout=10)
+            except (OSError, subprocess.SubprocessError):
+                pass
+        time.sleep(2)
+        if listeners(PORT):
+            print(f"guard: 清不掉 {PORT} 上的残留进程", file=sys.stderr)
+            return 2
+        print(f"✓ PDF 前置条件: 端口 {PORT} 已腾空")
         return 0
 
     print(

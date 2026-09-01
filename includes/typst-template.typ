@@ -14,7 +14,7 @@
   v(30%)
   align(center)[
     #text(size: 22pt, weight: "bold",
-          font: ("Source Han Sans SC", "Noto Sans CJK SC"))[#body]
+          font: ("Source Han Sans SC", "Noto Sans CJK SC", "PingFang SC", "Heiti SC"))[#body]
   ]
   pagebreak(weak: true)
 }
@@ -27,7 +27,7 @@
     v(30%)
     align(center)[
       #text(size: 22pt, weight: "bold",
-            font: ("Source Han Sans SC", "Noto Sans CJK SC"))[#title]
+            font: ("Source Han Sans SC", "Noto Sans CJK SC", "PingFang SC", "Heiti SC"))[#title]
     ]
     pagebreak(weak: true)
   }
@@ -79,7 +79,7 @@
   // "cannot reference heading without numbering"。
   set heading(numbering: "1.1.1")
 
-  show heading: set text(font: ("Source Han Sans SC", "Noto Sans CJK SC"))
+  show heading: set text(font: ("Source Han Sans SC", "Noto Sans CJK SC", "PingFang SC", "Heiti SC"))
   show heading: it => { set par(first-line-indent: 0em); it }
 
   // 代码块用中英等宽的字体，否则含中文注释的代码会歪
@@ -96,7 +96,7 @@
     v(30%)
     align(center)[
       #text(size: 24pt, weight: "bold",
-            font: ("Source Han Sans SC", "Noto Sans CJK SC"))[#title]
+            font: ("Source Han Sans SC", "Noto Sans CJK SC", "PingFang SC", "Heiti SC"))[#title]
       #if subtitle != none [ #v(10pt) #text(size: 12pt)[#subtitle] ]
       #if author != none [ #v(30pt) #text(size: 11pt)[#author] ]
     ]
