@@ -1,0 +1,76 @@
+name: 渲染并发布这本书
+
+# 每次推到 master 就重渲染并发到 GitHub Pages。
+#
+# 为什么先跑 make check 再渲染：判定不过就不该发。
+# 这和书里那条「fail closed」是同一件事 —— 判不了等于不通过，
+# 而这里的"判不了"包括判定脚本自己挂了（退出码 2）。
+#
+# 不装 typst：Pages 只要 HTML。PDF 在本地出，理由见 README。
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同时只跑一个发布，后来的排队而不是取消 —— 取消会让
+# "最后一次推送有没有被发出去"变成一个说不清的问题。
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: 1.6.40
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 装判定脚本要的东西
+        run: pip install pyyaml
+
+      - name: 跑全部判定
+        # autocorrect 在 CI 上没装，中文排版那道单独跳过；
+        # 其余八道都跑，不过不发。
+        run: |
+          python3 checks/xref.py
+          python3 checks/budget.py
+          python3 checks/terms.py
+          python3 checks/claims.py
+          python3 checks/concepts.py
+          python3 checks/voice.py
+          python3 checks/prose.py --strict
+          python3 checks/tics.py
+          python3 checks/redundancy.py
+
+      - name: 渲染
+        run: quarto render --to html
+
+      - name: 章节编号与交叉引用（要渲染产物才能查）
+        run: python3 checks/numbering.py
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _output
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
